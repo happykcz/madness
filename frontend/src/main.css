@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Competition-specific custom styles */
 @layer base {
@@ -12,32 +10,68 @@
   }
 
   body {
-    @apply font-sans text-gray-900 bg-gray-50;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: rgb(17 24 39);
+    background-color: rgb(249 250 251);
   }
 }
 
 @layer components {
   /* Competition button styles */
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: colors 200ms;
   }
 
   .btn-primary {
-    @apply btn bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800;
+    background-color: rgb(37 99 235);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: rgb(29 78 216);
+  }
+
+  .btn-primary:active {
+    background-color: rgb(30 64 175);
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400;
+    background-color: rgb(229 231 235);
+    color: rgb(31 41 55);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgb(209 213 219);
+  }
+
+  .btn-secondary:active {
+    background-color: rgb(156 163 175);
   }
 
   /* Score display card */
   .score-card {
-    @apply bg-white rounded-lg shadow-md p-4 border border-gray-200;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 1rem;
+    border: 1px solid rgb(229 231 235);
   }
 
   /* Route item in list */
   .route-item {
-    @apply bg-white border border-gray-200 rounded-lg p-3 mb-2 active:bg-gray-50 transition-colors;
+    background-color: white;
+    border: 1px solid rgb(229 231 235);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    transition: colors 200ms;
+  }
+
+  .route-item:active {
+    background-color: rgb(249 250 251);
   }
 }
 
