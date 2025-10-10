@@ -298,17 +298,27 @@ GROUP BY c.id, c.name, c.team_id, c.category, c.redpoint_grade;
 
 -- Hardest send leaderboard
 CREATE OR REPLACE VIEW hardest_send_leaderboard AS
+WITH climber_hardest AS (
+  SELECT
+    c.id AS climber_id,
+    c.name,
+    MAX(r.grade_numeric) AS hardest_grade
+  FROM climbers c
+  JOIN ascents a ON a.climber_id = c.id
+  JOIN routes r ON r.id = a.route_id
+  GROUP BY c.id, c.name
+)
 SELECT
-  c.id AS climber_id,
-  c.name,
-  MAX(r.grade_numeric) AS hardest_grade,
+  ch.climber_id,
+  ch.name,
+  ch.hardest_grade,
   r.grade AS hardest_grade_display,
-  COUNT(*) FILTER (WHERE r.grade_numeric = MAX(r.grade_numeric)) AS ascents_at_hardest
-FROM climbers c
-JOIN ascents a ON a.climber_id = c.id
-JOIN routes r ON r.id = a.route_id
-GROUP BY c.id, c.name, r.grade
-ORDER BY hardest_grade DESC, ascents_at_hardest DESC;
+  COUNT(*) AS ascents_at_hardest
+FROM climber_hardest ch
+JOIN ascents a ON a.climber_id = ch.climber_id
+JOIN routes r ON r.id = a.route_id AND r.grade_numeric = ch.hardest_grade
+GROUP BY ch.climber_id, ch.name, ch.hardest_grade, r.grade
+ORDER BY ch.hardest_grade DESC, ascents_at_hardest DESC;
 
 -- =============================================================================
 -- NOTE: Row Level Security policies are defined in rls-policies.sql
