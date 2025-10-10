@@ -1,0 +1,30 @@
+import { defineConfig } from 'vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  // Base public path - set to repo name for GitHub Pages deployment
+  // For custom domain or root deployment, change to '/'
+  base: '/12qm25/',
+
+  // Build options
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
+    // Optimize for modern browsers (mobile Safari 15+, Chrome 100+)
+    target: ['es2020', 'edge100', 'firefox100', 'chrome100', 'safari15'],
+  },
+
+  // Development server options
+  server: {
+    port: 5173,
+    strictPort: false,
+    open: true,
+  },
+
+  // Preview server options (for testing production build)
+  preview: {
+    port: 4173,
+    strictPort: false,
+  },
+})
