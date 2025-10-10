@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Competition-specific custom styles */
+@layer base {
+  /* Mobile-first typography for climbing competition */
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans text-gray-900 bg-gray-50;
+  }
+}
+
+@layer components {
+  /* Competition button styles */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400;
+  }
+
+  /* Score display card */
+  .score-card {
+    @apply bg-white rounded-lg shadow-md p-4 border border-gray-200;
+  }
+
+  /* Route item in list */
+  .route-item {
+    @apply bg-white border border-gray-200 rounded-lg p-3 mb-2 active:bg-gray-50 transition-colors;
+  }
+}
+
+@layer utilities {
+  /* Touch-friendly tap targets (minimum 44px) */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area insets for mobile devices */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
