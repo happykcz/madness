@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Connection Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+    button {
+      background: #ff0046;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #cc0038;
+    }
+    pre {
+      background: #f6f8fa;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Supabase Connection Test</h1>
+
+  <div class="card">
+    <h2>Environment Variables</h2>
+    <div id="env-check"></div>
+  </div>
+
+  <div class="card">
+    <h2>Connection Test</h2>
+    <button onclick="testConnection()">Test Connection</button>
+    <div id="connection-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>Tables Test</h2>
+    <button onclick="testTables()">Check Tables</button>
+    <div id="tables-result"></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+    // Check environment variables
+    const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || 'NOT SET'
+    const supabaseKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'NOT SET'
+
+    document.getElementById('env-check').innerHTML = `
+      <p><strong>VITE_SUPABASE_URL:</strong> <span class="${supabaseUrl !== 'NOT SET' ? 'success' : 'error'}">${supabaseUrl === 'NOT SET' ? 'NOT SET ❌' : '✅ Set'}</span></p>
+      <p><strong>VITE_SUPABASE_ANON_KEY:</strong> <span class="${supabaseKey !== 'NOT SET' ? 'success' : 'error'}">${supabaseKey === 'NOT SET' ? 'NOT SET ❌' : '✅ Set'}</span></p>
+      ${supabaseUrl === 'NOT SET' ? '<p class="error">⚠️ Create a .env file in the frontend directory with your Supabase credentials</p>' : ''}
+    `
+
+    // Create client (will work from .env in dev mode)
+    let supabase
+    try {
+      // For dev server, Vite will load from .env
+      // For this test file, you'll need to set them below manually
+      const url = supabaseUrl !== 'NOT SET' ? supabaseUrl : 'YOUR_SUPABASE_URL'
+      const key = supabaseKey !== 'NOT SET' ? supabaseKey : 'YOUR_ANON_KEY'
+
+      supabase = createClient(url, key)
+    } catch (error) {
+      console.error('Failed to create Supabase client:', error)
+    }
+
+    // Test connection
+    window.testConnection = async function() {
+      const resultDiv = document.getElementById('connection-result')
+      resultDiv.innerHTML = '<p>Testing connection...</p>'
+
+      try {
+        const { data, error } = await supabase
+          .from('teams')
+          .select('count', { count: 'exact', head: true })
+
+        if (error) throw error
+
+        resultDiv.innerHTML = `
+          <p class="success">✅ Connection successful!</p>
+          <p>Teams table is accessible</p>
+        `
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <p class="error">❌ Connection failed</p>
+          <pre>${error.message}</pre>
+        `
+      }
+    }
+
+    // Test all tables
+    window.testTables = async function() {
+      const resultDiv = document.getElementById('tables-result')
+      resultDiv.innerHTML = '<p>Checking tables...</p>'
+
+      const tables = [
+        'teams', 'climbers', 'routes', 'ascents',
+        'bonus_games', 'bonus_entries', 'scoring_windows',
+        'team_overrides', 'administrators'
+      ]
+
+      const results = []
+
+      for (const table of tables) {
+        try {
+          const { error } = await supabase
+            .from(table)
+            .select('count', { count: 'exact', head: true })
+
+          if (error) throw error
+          results.push(`<li class="success">✅ ${table}</li>`)
+        } catch (error) {
+          results.push(`<li class="error">❌ ${table} - ${error.message}</li>`)
+        }
+      }
+
+      resultDiv.innerHTML = `
+        <h3>Table Status:</h3>
+        <ul>${results.join('')}</ul>
+      `
+    }
+  </script>
+</body>
+</html>

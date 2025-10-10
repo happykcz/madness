@@ -7,7 +7,7 @@
 -- =============================================================================
 
 -- Check if user is an administrator
-CREATE OR REPLACE FUNCTION auth.is_admin()
+CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
@@ -55,23 +55,23 @@ USING (auth.uid() = auth_user_id);
 -- Admins can read all teams
 CREATE POLICY "teams_select_admin"
 ON teams FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Only admins can insert teams
 CREATE POLICY "teams_insert_admin"
 ON teams FOR INSERT
-WITH CHECK (auth.is_admin());
+WITH CHECK (public.is_admin());
 
 -- Only admins can update teams
 CREATE POLICY "teams_update_admin"
 ON teams FOR UPDATE
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Only admins can delete teams
 CREATE POLICY "teams_delete_admin"
 ON teams FOR DELETE
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- =============================================================================
 -- CLIMBERS TABLE POLICIES
@@ -91,13 +91,13 @@ USING (
 -- Admins can read all climbers
 CREATE POLICY "climbers_select_admin"
 ON climbers FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Only admins can manage climbers
 CREATE POLICY "climbers_manage_admin"
 ON climbers FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- ROUTES TABLE POLICIES
@@ -114,8 +114,8 @@ USING (TRUE);
 -- Only admins can manage routes
 CREATE POLICY "routes_manage_admin"
 ON routes FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- ASCENTS TABLE POLICIES
@@ -142,7 +142,7 @@ USING (
 -- Admins can read all ascents anytime
 CREATE POLICY "ascents_select_admin"
 ON ascents FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Teams can insert ascents during active window OR with override
 CREATE POLICY "ascents_insert_during_window"
@@ -167,13 +167,13 @@ WITH CHECK (
 -- Admins can always insert ascents
 CREATE POLICY "ascents_insert_admin"
 ON ascents FOR INSERT
-WITH CHECK (auth.is_admin());
+WITH CHECK (public.is_admin());
 
 -- Admins can update/delete ascents (corrections)
 CREATE POLICY "ascents_manage_admin"
 ON ascents FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- BONUS GAMES TABLE POLICIES
@@ -190,8 +190,8 @@ USING (TRUE);
 -- Only admins can manage bonus games
 CREATE POLICY "bonus_games_manage_admin"
 ON bonus_games FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- BONUS ENTRIES TABLE POLICIES
@@ -214,7 +214,7 @@ USING (
 -- Admins can read all bonus entries
 CREATE POLICY "bonus_entries_select_admin"
 ON bonus_entries FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Teams can insert bonus entries during active window
 CREATE POLICY "bonus_entries_insert_during_window"
@@ -232,13 +232,13 @@ WITH CHECK (
 -- Admins can always insert bonus entries
 CREATE POLICY "bonus_entries_insert_admin"
 ON bonus_entries FOR INSERT
-WITH CHECK (auth.is_admin());
+WITH CHECK (public.is_admin());
 
 -- Admins can update/delete bonus entries
 CREATE POLICY "bonus_entries_manage_admin"
 ON bonus_entries FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- SCORING WINDOWS TABLE POLICIES
@@ -255,8 +255,8 @@ USING (TRUE);
 -- Only admins can manage scoring windows
 CREATE POLICY "scoring_windows_manage_admin"
 ON scoring_windows FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- TEAM OVERRIDES TABLE POLICIES
@@ -276,13 +276,13 @@ USING (
 -- Admins can read all overrides
 CREATE POLICY "team_overrides_select_admin"
 ON team_overrides FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Only admins can manage overrides
 CREATE POLICY "team_overrides_manage_admin"
 ON team_overrides FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- ADMINISTRATORS TABLE POLICIES
@@ -293,13 +293,13 @@ ALTER TABLE administrators ENABLE ROW LEVEL SECURITY;
 -- Admins can read all administrators
 CREATE POLICY "administrators_select_admin"
 ON administrators FOR SELECT
-USING (auth.is_admin());
+USING (public.is_admin());
 
 -- Only admins can manage administrators
 CREATE POLICY "administrators_manage_admin"
 ON administrators FOR ALL
-USING (auth.is_admin())
-WITH CHECK (auth.is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- =============================================================================
 -- VIEW POLICIES (inherit from base tables via RLS)
@@ -334,7 +334,7 @@ Key RLS behaviors:
 3. Data Isolation:
    - Teams cannot see other teams' ascents during competition
    - Teams cannot modify other teams' data (enforced by climber_id check)
-   - Admins bypass all restrictions via auth.is_admin() checks
+   - Admins bypass all restrictions via public.is_admin() checks
 
 4. Performance Considerations:
    - RLS policies are applied on every query
