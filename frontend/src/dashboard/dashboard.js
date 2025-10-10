@@ -1,0 +1,300 @@
+/**
+ * Team Dashboard
+ *
+ * Shows team information, climbers, and current scores.
+ * Phase 3 - Basic dashboard after successful login
+ */
+
+import { authManager } from '../auth/auth-manager.js'
+import { supabase } from '../lib/supabase.js'
+import { showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
+
+/**
+ * Render team dashboard
+ */
+export async function renderDashboard() {
+  const app = document.querySelector('#app')
+
+  // Show loading while fetching data
+  app.innerHTML = `
+    <div class="min-h-screen" style="background-color: #fafbfc;">
+      <header class="header">
+        <div class="container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
+            </div>
+            <button class="btn btn-secondary" id="sign-out-btn">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container" style="padding-top: 32px;">
+        <div style="text-align: center; padding: 40px;">
+          <p style="color: #586069;">Loading your team data...</p>
+        </div>
+      </main>
+    </div>
+  `
+
+  // Fetch team data
+  try {
+    const teamData = await fetchTeamData()
+
+    if (!teamData) {
+      renderError('Failed to load team data')
+      return
+    }
+
+    renderDashboardContent(teamData)
+  } catch (error) {
+    console.error('Dashboard error:', error)
+    renderError('An error occurred while loading the dashboard')
+  }
+
+  // Setup sign out handler
+  document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
+    await authManager.signOut()
+  })
+}
+
+/**
+ * Fetch team data from Supabase
+ */
+async function fetchTeamData() {
+  const user = authManager.getUser()
+  if (!user) return null
+
+  try {
+    // Fetch team
+    const { data: team, error: teamError } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (teamError) throw teamError
+
+    // Fetch climbers
+    const { data: climbers, error: climbersError } = await supabase
+      .from('climbers')
+      .select('*')
+      .eq('team_id', team.id)
+
+    if (climbersError) throw climbersError
+
+    // Fetch team score
+    const { data: teamScore, error: scoreError } = await supabase
+      .from('team_scores')
+      .select('*')
+      .eq('team_id', team.id)
+      .single()
+
+    // Score might not exist yet (no ascents logged)
+    const score = scoreError ? null : teamScore
+
+    // Fetch climber scores
+    const { data: climberScores, error: climberScoresError } = await supabase
+      .from('climber_scores')
+      .select('*')
+      .in('climber_id', climbers.map(c => c.id))
+
+    const scores = climberScoresError ? [] : climberScores
+
+    return {
+      team,
+      climbers,
+      teamScore: score,
+      climberScores: scores,
+    }
+  } catch (error) {
+    console.error('Failed to fetch team data:', error)
+    showError('Failed to load team data: ' + error.message)
+    return null
+  }
+}
+
+/**
+ * Render dashboard with team data
+ */
+function renderDashboardContent(data) {
+  const { team, climbers, teamScore, climberScores } = data
+  const app = document.querySelector('#app')
+
+  const totalPoints = teamScore?.total_points || 0
+  const totalAscents = teamScore?.total_ascents || 0
+
+  app.innerHTML = `
+    <div class="min-h-screen" style="background-color: #fafbfc;">
+      <header class="header">
+        <div class="container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
+            </div>
+            <button class="btn btn-secondary" id="sign-out-btn">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container" style="padding-top: 32px; padding-bottom: 32px;">
+        <!-- Team Info Card -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 4px;">
+                ${team.team_name}
+              </h2>
+              <p style="color: #586069; font-size: 14px;">
+                Team ID: ${team.team_id} • Category: ${capitalizeFirst(team.category)}
+              </p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 32px; font-weight: 700; color: #ff0046;">
+                ${totalPoints}
+              </div>
+              <div style="font-size: 14px; color: #586069;">
+                Total Points
+              </div>
+            </div>
+          </div>
+
+          <div style="padding-top: 16px; border-top: 1px solid #e1e4e8;">
+            <div style="display: flex; gap: 32px;">
+              <div>
+                <div style="font-size: 20px; font-weight: 600; color: #24292e;">${totalAscents}</div>
+                <div style="font-size: 12px; color: #586069;">Total Ascents</div>
+              </div>
+              <div>
+                <div style="font-size: 20px; font-weight: 600; color: #24292e;">${climbers.length}</div>
+                <div style="font-size: 12px; color: #586069;">Team Members</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Climbers Section -->
+        <h3 style="color: #24292e; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+          Team Members
+        </h3>
+
+        ${climbers.map(climber => {
+          const climberScore = climberScores.find(s => s.climber_id === climber.id)
+          const points = climberScore?.total_points || 0
+          const ascents = climberScore?.route_ascents || 0
+
+          return `
+            <div class="card" style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <h4 style="color: #24292e; font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                    ${climber.name}
+                  </h4>
+                  <p style="color: #586069; font-size: 14px;">
+                    Age: ${climber.age} • Grade: ${climber.redpoint_grade} • Category: ${capitalizeFirst(climber.category)}
+                  </p>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 24px; font-weight: 600; color: #ff0046;">
+                    ${points}
+                  </div>
+                  <div style="font-size: 12px; color: #586069;">
+                    ${ascents} ascent${ascents !== 1 ? 's' : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+        }).join('')}
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="alert('Log Ascent feature coming in Phase 4!')">
+            Log Ascent
+          </button>
+          <button class="btn btn-secondary" onclick="alert('View Routes feature coming in Phase 4!')">
+            View Routes
+          </button>
+        </div>
+
+        <!-- Info Box -->
+        <div style="
+          margin-top: 32px;
+          padding: 16px;
+          background-color: #d1ecf1;
+          border: 1px solid #bee5eb;
+          border-radius: 6px;
+          color: #0c5460;
+          font-size: 14px;
+        ">
+          <strong>✅ Phase 3 Complete:</strong> Team authentication is working! You're now logged in as ${team.team_name}.
+          <br><br>
+          <strong>🚧 Coming in Phase 4:</strong> Route logging, real-time scoring, and ascent tracking.
+        </div>
+      </main>
+    </div>
+  `
+
+  // Re-attach sign out handler
+  document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
+    await authManager.signOut()
+  })
+}
+
+/**
+ * Render error state
+ */
+function renderError(message) {
+  const app = document.querySelector('#app')
+
+  app.innerHTML = `
+    <div class="min-h-screen" style="background-color: #fafbfc;">
+      <header class="header">
+        <div class="container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
+            </div>
+            <button class="btn btn-secondary" id="sign-out-btn">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container" style="padding-top: 32px;">
+        <div class="card max-w-2xl mx-auto text-center">
+          <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 16px;">
+            ❌ Error
+          </h2>
+          <p style="color: #586069; margin-bottom: 24px;">
+            ${message}
+          </p>
+          <button class="btn btn-primary" onclick="window.location.reload()">
+            Reload Page
+          </button>
+        </div>
+      </main>
+    </div>
+  `
+
+  document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
+    await authManager.signOut()
+  })
+}
+
+/**
+ * Capitalize first letter
+ */
+function capitalizeFirst(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+export default renderDashboard

@@ -1,6 +1,8 @@
 import './main.css'
 import { router } from './lib/router.js'
 import { authManager } from './auth/auth-manager.js'
+import { renderLogin } from './auth/login.js'
+import { renderDashboard } from './dashboard/dashboard.js'
 import { showInfo, showSuccess } from './shared/ui-helpers.js'
 
 // Application entry point
@@ -55,7 +57,7 @@ function renderHome() {
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
-              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
+              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness 2025</h1>
             </div>
             <button class="btn btn-secondary" onclick="window.location.hash='#/login'">
               Sign In
@@ -101,60 +103,7 @@ function renderHome() {
   `
 }
 
-/**
- * Render login page (placeholder for Phase 3)
- */
-function renderLogin() {
-  const app = document.querySelector('#app')
-  app.innerHTML = `
-    <div class="min-h-screen flex items-center justify-center" style="background-color: #fafbfc;">
-      <div class="card max-w-md w-full text-center">
-        <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-16 mx-auto mb-6" />
-        <h2 class="text-2xl font-semibold mb-4" style="color: #24292e;">Team Login</h2>
-        <p style="color: #586069;">Login page will be implemented in Phase 3 (User Story 2)</p>
-        <button class="btn btn-secondary mt-6" onclick="window.location.hash='#/'">
-          Back to Home
-        </button>
-      </div>
-    </div>
-  `
-}
-
-/**
- * Render dashboard (placeholder for Phase 4)
- */
-function renderDashboard() {
-  const app = document.querySelector('#app')
-  app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
-      <header class="header">
-        <div class="container">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
-              <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
-            </div>
-            <button class="btn btn-secondary" id="sign-out-btn">
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main class="container" style="padding-top: 32px;">
-        <div class="card max-w-2xl mx-auto text-center">
-          <h2 class="text-2xl font-semibold mb-4" style="color: #24292e;">Dashboard</h2>
-          <p style="color: #586069;">Dashboard will be implemented in Phase 4 (User Story 1)</p>
-        </div>
-      </main>
-    </div>
-  `
-
-  // Add sign out handler
-  document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
-    await authManager.signOut()
-  })
-}
+// renderLogin and renderDashboard are now imported from separate modules
 
 // Initialize router
 router.init()
