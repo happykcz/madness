@@ -291,7 +291,7 @@ function renderRoutesList() {
  */
 function renderRouteCard(route) {
   const isZeroPoint = route.base_points === 0
-  const typeColor = route.route_type === 'trad' ? '#ff0046' : route.route_type === 'boulder' ? '#6f42c1' : '#0366d6'
+  const typeColor = route.gear_type === 'trad' ? '#ff0046' : route.gear_type === 'boulder' ? '#6f42c1' : '#0366d6'
 
   // Get attempts for this route by current climber
   const routeAttempts = climberAttempts.filter(a => a.route_id === route.id)
@@ -340,7 +340,7 @@ function renderRouteCard(route) {
               color: white;
               border-radius: 3px;
             ">
-              ${route.route_type.toUpperCase()}
+              ${route.gear_type.toUpperCase()}
             </span>
             <span style="font-size: 13px; color: var(--text-secondary);">
               Grade ${route.grade}
@@ -351,7 +351,7 @@ function renderRouteCard(route) {
               </span>
             ` : `
               <span style="font-size: 13px; color: var(--color-primary); font-weight: 600;">
-                ${route.base_points} pts${route.route_type === 'trad' ? ' +50%' : ''}
+                ${route.base_points} pts${route.gear_type === 'trad' ? ' +50%' : ''}
               </span>
             `}
           </div>
@@ -367,7 +367,7 @@ function renderRouteCard(route) {
 function filterRoutes(allRoutes) {
   return allRoutes.filter(route => {
     // Type filter
-    if (currentFilters.type !== 'all' && route.route_type !== currentFilters.type) {
+    if (currentFilters.type !== 'all' && route.gear_type !== currentFilters.type) {
       return false
     }
 
@@ -528,7 +528,7 @@ async function showAttemptModal(route) {
   }
 
   const tickNumber = (existingAttempts?.length || 0) + 1
-  const isTrad = route.route_type === 'trad'
+  const isTrad = route.gear_type === 'trad'
   const tickPoints = calculateTickPoints(route.base_points, tickNumber, isTrad)
 
   // Create modal overlay
@@ -574,7 +574,7 @@ async function showAttemptModal(route) {
           ${route.name}
         </div>
         <div style="font-size: 14px; color: var(--text-secondary);">
-          ${route.route_type.toUpperCase()} • Grade ${route.grade} • ${route.base_points} pts${isTrad ? ' +50%' : ''}
+          ${route.gear_type.toUpperCase()} • Grade ${route.grade} • ${route.base_points} pts${isTrad ? ' +50%' : ''}
         </div>
       </div>
 
