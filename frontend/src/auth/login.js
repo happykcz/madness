@@ -60,23 +60,44 @@ export function renderLogin() {
             <label for="password" style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e; font-size: 14px;">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your team password"
-              required
-              autocomplete="current-password"
-              style="
-                width: 100%;
-                padding: 8px 12px;
-                border: 1px solid #d1d5da;
-                border-radius: 6px;
-                font-size: 14px;
-                box-sizing: border-box;
-                background-color: #fafbfc;
-              "
-            />
+            <div style="position: relative;">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your team password"
+                required
+                autocomplete="current-password"
+                style="
+                  width: 100%;
+                  padding: 8px 40px 8px 12px;
+                  border: 1px solid #d1d5da;
+                  border-radius: 6px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                  background-color: #fafbfc;
+                "
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                style="
+                  position: absolute;
+                  right: 8px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  background: none;
+                  border: none;
+                  color: #586069;
+                  cursor: pointer;
+                  padding: 4px 8px;
+                  font-size: 12px;
+                  font-weight: 500;
+                "
+              >
+                Show
+              </button>
+            </div>
           </div>
 
           <!-- Cloudflare Turnstile Widget -->
@@ -204,6 +225,21 @@ function initializeTurnstile() {
 function setupLoginForm() {
   const form = document.getElementById('login-form')
   const errorDiv = document.getElementById('login-error')
+
+  // Setup password toggle
+  const passwordInput = document.getElementById('password')
+  const toggleButton = document.getElementById('toggle-password')
+
+  toggleButton.addEventListener('click', () => {
+    const type = passwordInput.getAttribute('type')
+    if (type === 'password') {
+      passwordInput.setAttribute('type', 'text')
+      toggleButton.textContent = 'Hide'
+    } else {
+      passwordInput.setAttribute('type', 'password')
+      toggleButton.textContent = 'Show'
+    }
+  })
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault()

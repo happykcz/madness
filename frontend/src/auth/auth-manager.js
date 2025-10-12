@@ -66,6 +66,8 @@ class AuthManager {
       // Team ID is used as email: team_001@quarrymadness.local
       const email = `${teamId}@quarrymadness.local`
 
+      console.log('🔐 Attempting login with:', { email, passwordLength: password.length })
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

@@ -12,7 +12,7 @@ Go to: Authentication → Users → Add User
 
 Create user with:
 - Email: team_001@quarrymadness.local
-- Password: TestPassword123! (or your choice)
+- Password: 1234 (or your choice)
 - Auto Confirm Email: YES
 
 Copy the UUID of the created user, then replace 'YOUR_AUTH_USER_UUID' below
@@ -26,7 +26,7 @@ Copy the UUID of the created user, then replace 'YOUR_AUTH_USER_UUID' below
 -- Example: '12345678-1234-1234-1234-123456789abc'
 DO $$
 DECLARE
-  v_auth_user_id UUID := 'ae9642de-5e87-4bc1-af31-56315b0ca254'; -- REPLACE THIS!
+  v_auth_user_id UUID := 'a0228af7-6a51-472a-9993-7c70c2d96496'; -- REPLACE THIS!
   v_team_id UUID;
   v_climber1_id UUID;
   v_climber2_id UUID;
@@ -59,44 +59,42 @@ END $$;
 -- STEP 3: Create Sample Routes
 -- =============================================================================
 
-INSERT INTO routes (route_name, sector, grade, grade_numeric, gear_type, base_points)
+INSERT INTO routes (sector, name, grade, grade_numeric, gear_type, base_points)
 VALUES
   -- Sport routes at The Quarry
-  ('Easy Street', 'Main Wall', '15', 15, 'sport', 8),
-  ('Moderate Challenge', 'Main Wall', '18', 18, 'sport', 12),
-  ('Hard Times', 'Main Wall', '21', 21, 'sport', 16),
-  ('Project X', 'Main Wall', '24', 24, 'sport', 20),
+  ('Main Wall', 'Easy Street', '15', 15, 'sport', 8),
+  ('Main Wall', 'Moderate Challenge', '18', 18, 'sport', 12),
+  ('Main Wall', 'Hard Times', '21', 21, 'sport', 16),
+  ('Main Wall', 'Project X', '24', 24, 'sport', 20),
 
-  -- Trad routes (with 50% bonus in base_points)
-  ('Traditional Crack', 'Trad Area', '16', 16, 'trad', 12),  -- 8 * 1.5
-  ('Classic Line', 'Trad Area', '20', 20, 'trad', 18),       -- 12 * 1.5
+  -- Trad routes (50% bonus applied by scoring engine at calculation time)
+  ('Trad Area', 'Traditional Crack', '16', 16, 'trad', 8),   -- base 8, scoring engine applies 1.5x = 12
+  ('Trad Area', 'Classic Line', '20', 20, 'trad', 12),       -- base 12, scoring engine applies 1.5x = 18
 
   -- Boulder problems
-  ('Easy Boulder', 'Boulder Field', 'V1', 1, 'boulder', 8),
-  ('Mid Boulder', 'Boulder Field', 'V3', 3, 'boulder', 16),
-  ('Hard Boulder', 'Boulder Field', 'V5', 5, 'boulder', 20);
+  ('Boulder Field', 'Easy Boulder', 'V1', 1, 'boulder', 8),
+  ('Boulder Field', 'Mid Boulder', 'V3', 3, 'boulder', 16),
+  ('Boulder Field', 'Hard Boulder', 'V5', 5, 'boulder', 20);
 
 -- =============================================================================
 -- STEP 4: Create Scoring Window (Competition is ACTIVE)
 -- =============================================================================
 
-INSERT INTO scoring_windows (name, started_at, ended_at, is_default)
+INSERT INTO scoring_windows (started_at, ended_at)
 VALUES (
-  'Test Competition - Active',
   NOW() - INTERVAL '1 hour',  -- Started 1 hour ago
-  NOW() + INTERVAL '5 hours', -- Ends in 5 hours
-  TRUE
+  NOW() + INTERVAL '5 hours'  -- Ends in 5 hours
 );
 
 -- =============================================================================
 -- STEP 5: Create Sample Bonus Games
 -- =============================================================================
 
-INSERT INTO bonus_games (game_name, description, points_awarded)
+INSERT INTO bonus_games (name, points)
 VALUES
-  ('Dyno Challenge', 'Successfully complete the dynamic move challenge', 10),
-  ('Speed Climb', 'Complete the speed route under 60 seconds', 10),
-  ('Endurance Wall', 'Complete 10 routes without rest', 15);
+  ('Dyno Challenge', 10),
+  ('Speed Climb', 10),
+  ('Endurance Wall', 15);
 
 -- =============================================================================
 -- VERIFICATION QUERIES
@@ -109,10 +107,10 @@ SELECT 'Teams created:' AS info, team_id, team_name, category FROM teams;
 SELECT 'Climbers created:' AS info, name, age, redpoint_grade, category FROM climbers;
 
 -- Verify routes created
-SELECT 'Routes created:' AS info, route_name, grade, gear_type, base_points FROM routes;
+SELECT 'Routes created:' AS info, name, grade, gear_type, base_points FROM routes;
 
 -- Verify scoring window
-SELECT 'Scoring window:' AS info, name, started_at, ended_at,
+SELECT 'Scoring window:' AS info, started_at, ended_at,
        CASE
          WHEN started_at <= NOW() AND (ended_at IS NULL OR ended_at > NOW())
          THEN 'ACTIVE ✅'
@@ -121,7 +119,7 @@ SELECT 'Scoring window:' AS info, name, started_at, ended_at,
 FROM scoring_windows;
 
 -- Verify bonus games
-SELECT 'Bonus games:' AS info, game_name, points_awarded FROM bonus_games;
+SELECT 'Bonus games:' AS info, name, points FROM bonus_games;
 
 -- =============================================================================
 -- LOGIN CREDENTIALS FOR TESTING

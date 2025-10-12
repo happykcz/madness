@@ -1,8 +1,12 @@
 import './main.css'
 import { router } from './lib/router.js'
 import { authManager } from './auth/auth-manager.js'
+import { supabase } from './lib/supabase.js'
 import { renderLogin } from './auth/login.js'
 import { renderDashboard } from './dashboard/dashboard.js'
+import { renderAdminLogin } from './admin/admin-login.js'
+import { renderAdminDashboard } from './admin/admin-dashboard.js'
+import { renderTeamManagement } from './admin/admin-teams.js'
 import { showInfo, showSuccess } from './shared/ui-helpers.js'
 
 // Application entry point
@@ -13,10 +17,18 @@ authManager.init().then(() => {
   console.log('Auth manager ready')
 
   // Listen for auth state changes
-  authManager.onAuthStateChange((event, session) => {
+  authManager.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') {
       showSuccess('Successfully signed in!')
-      router.navigate('/dashboard')
+
+      // Check if user is admin
+      const { data: isAdmin } = await supabase.rpc('is_admin')
+
+      if (isAdmin) {
+        router.navigate('/admin/dashboard')
+      } else {
+        router.navigate('/dashboard')
+      }
     } else if (event === 'SIGNED_OUT') {
       showInfo('Signed out')
       router.navigate('/login')
@@ -29,16 +41,44 @@ router.registerRoutes({
   '/': renderHome,
   '/login': renderLogin,
   '/dashboard': renderDashboard,
+  '/admin': renderAdminLogin,
+  '/admin/dashboard': renderAdminDashboard,
+  '/admin/teams': renderTeamManagement,
 })
 
 // Add auth guard for protected routes
 router.beforeEach(async (to, from, next) => {
-  const protectedRoutes = ['/dashboard']
+  const teamProtectedRoutes = ['/dashboard']
+  const adminProtectedRoutes = ['/admin/dashboard', '/admin/teams', '/admin/results', '/admin/settings']
 
-  if (protectedRoutes.includes(to) && !authManager.isAuthenticated()) {
-    console.log('Protected route - redirecting to login')
+  // Check team routes
+  if (teamProtectedRoutes.includes(to) && !authManager.isAuthenticated()) {
+    console.log('Protected team route - redirecting to login')
     next('/login')
     return false
+  }
+
+  // Check admin routes
+  if (adminProtectedRoutes.includes(to)) {
+    if (!authManager.isAuthenticated()) {
+      console.log('Protected admin route - redirecting to admin login')
+      next('/admin')
+      return false
+    }
+
+    // Verify admin privileges
+    try {
+      const { data: isAdmin, error } = await supabase.rpc('is_admin')
+      if (error || !isAdmin) {
+        console.log('Not an admin - redirecting')
+        next('/')
+        return false
+      }
+    } catch (err) {
+      console.error('Error checking admin status:', err)
+      next('/')
+      return false
+    }
   }
 
   return true
@@ -59,9 +99,14 @@ function renderHome() {
               <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness 2025</h1>
             </div>
-            <button class="btn btn-secondary" onclick="window.location.hash='#/login'">
-              Sign In
-            </button>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" onclick="window.location.hash='#/login'">
+                Team Sign In
+              </button>
+              <button class="btn" style="background-color: #444d56; color: white;" onclick="window.location.hash='#/admin'">
+                Admin
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -1,2 +1,42 @@
-the app main colour is #ff0046
-cawa logo @cawa_logo_madness.png
+sounds good, my comments and answers 
+
+## ui/ux design
+- pls change the apps backgourn from #fafbfc to soemthing more mathing the themes primary colour, like very light ping or so? 
+- pls don't use the blue colour you have in some of the buttons/badges/links in the admin dashboard. use secondary/tertiary instead
+
+## team creation
+I will create all teams manually for now following the instructions. Its' a bit teadious but i should have only about 15 teams, so it should be fine. 
+I will probably make some extra fake teams just in case in need extra on the day for late signups. Because of this, I need to have option to change teams name, category, and all members details (names, cateogry, ages, etc). I don't need to change the team id or passwords.
+
+## team/climber categories
+Climbers can register in three categories based on their hardest redpoint on the rock:
+- Recreational: Hardest redpoint up to grade 19
+- Intermediate Usually climbs in the 20 to 23
+- Advanced: Climbs grade 24+
+
+The team category will be based on the category of the stronger/older climber in the team.
+- A Masters team – at least one team member is 50+ or both team members are 45+
+- A recreational team – both team members are in the recreational category
+- An intermediate team – one or both members are intermediate climbers
+- An advanced team – one or both members are advanced climbers
+
+## scoring
+- each route will ahve Base points by grade (for all; sport, trad and boulders) 
+- there will be routes with 0 points; these are routes on which climbers are not allowed to score. I just need to keep these in so climbers can navigate themselves better on the crag. These routes could muted text or something like that. It also would be nice to have an option to hide these routes if the competiror doesn't want to see them. 
+- the scorring page should display all routes in given groups, given order, and with names, grade and base points and then a score box for each climber. the box should dipslay how many attempts the climber has made in nice format like pie chart or something and total score for the route.
+- we probably should have option to filter the routes by type of climbing (sport, trad, boulders), by category grade bend (recreational 19<=, intermediate 20-23, advanced 24+).
+- there will be a 50% bonus for trad routes
+- each route can be scored/ticked multiple times by the same climber. The first time will get 100% points, the second 75%, the third 50%, the fourth 25%, and the fift or more will get 0% points (this has been change since the last version of the app) Trad bonus still needs to apply. 
+- Team scoring; score = sum of both climbers’ points.
+- Games scoring; each climber can have only one score on each game. the score will be manually entered. I don't know the value min/max values for each game yet and might need an option to change it.
+
+## answers to your questions
+- there will be about 60 routes
+- routes don't belong to categories. any climber can score on any route
+- i think we have a little misunderstadnign about the scorign window. The competiton is officily 6am to 6pm on Saturday the 18th of october (Western Australian time). The admin should be able to set the main scorring window (the dates i mentioned above) but also have option to open the scoring window outside of these dates with a simple button to do so. The window is the same for all competitors.
+- teams should not see other teams scores. they should only see their own scores. the admin dashboard should provide real-time leaderboards broken down by team categories and individual climber categories and also display a list of the hadrest sends and list of total ticks (sends) by climber and by team.
+
+## extra functionality
+- i'd like to nudge competitors with displaying a hint of the leaderboard results, like show them the leaderboard at every 3hrs or something like that.
+
+before aplying all this, i want you to git commit accordingly 
