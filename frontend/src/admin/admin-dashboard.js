@@ -84,30 +84,30 @@ function renderDashboard(stats) {
           Manage teams, view results, and control competition settings
         </p>
 
-        <!-- Stats Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+        <!-- Stats Cards (mobile-optimized) -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
           <!-- Total Teams -->
-          <div class="card">
-            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Total Teams</div>
-            <div style="color: var(--text-primary); font-size: 32px; font-weight: 600;">${stats.total_teams || 0}</div>
+          <div class="card" style="padding: 12px;">
+            <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 2px;">Teams</div>
+            <div style="color: var(--text-primary); font-size: 24px; font-weight: 600;">${stats.total_teams || 0}</div>
           </div>
 
           <!-- Total Climbers -->
-          <div class="card">
-            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Total Climbers</div>
-            <div style="color: var(--text-primary); font-size: 32px; font-weight: 600;">${stats.total_climbers || 0}</div>
+          <div class="card" style="padding: 12px;">
+            <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 2px;">Climbers</div>
+            <div style="color: var(--text-primary); font-size: 24px; font-weight: 600;">${stats.total_climbers || 0}</div>
           </div>
 
           <!-- Total Ascents -->
-          <div class="card">
-            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Total Ascents</div>
-            <div style="color: var(--text-primary); font-size: 32px; font-weight: 600;">${stats.total_ascents || 0}</div>
+          <div class="card" style="padding: 12px;">
+            <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 2px;">Ascents</div>
+            <div style="color: var(--text-primary); font-size: 24px; font-weight: 600;">${stats.total_ascents || 0}</div>
           </div>
 
           <!-- Active Windows -->
-          <div class="card">
-            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Active Windows</div>
-            <div style="color: var(--text-primary); font-size: 32px; font-weight: 600;">${stats.active_windows || 0}</div>
+          <div class="card" style="padding: 12px;">
+            <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 2px;">Windows</div>
+            <div style="color: var(--text-primary); font-size: 24px; font-weight: 600;">${stats.active_windows || 0}</div>
           </div>
         </div>
 
@@ -120,19 +120,21 @@ function renderDashboard(stats) {
         ` : ''}
 
         <!-- Navigation Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
           <!-- Team Management -->
           <div class="card hover-card" id="nav-teams" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 16px;">
-              <div style="font-size: 40px;">👥</div>
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               <div style="flex: 1;">
-                <h3 style="color: var(--text-primary); font-size: 20px; font-weight: 600; margin-bottom: 8px;">
+                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
                   Team Management
                 </h3>
-                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
-                  Create new teams, view credentials, reset passwords, and manage team information
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                  Create and manage teams, view credentials, and edit team information
                 </p>
-                <div style="margin-top: 12px; color: var(--color-primary); font-weight: 500;">
+                <div style="margin-top: 8px; color: var(--color-primary); font-weight: 500; font-size: 14px;">
                   Manage Teams →
                 </div>
               </div>
@@ -141,16 +143,18 @@ function renderDashboard(stats) {
 
           <!-- Results & Leaderboard -->
           <div class="card hover-card" id="nav-results" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 16px;">
-              <div style="font-size: 40px;">📊</div>
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
+                <path d="M18 20V10M12 20V4M6 20v-6" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               <div style="flex: 1;">
-                <h3 style="color: var(--text-primary); font-size: 20px; font-weight: 600; margin-bottom: 8px;">
+                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
                   Results & Leaderboard
                 </h3>
-                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
-                  View current standings, filter by category, export results, and monitor live competition
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                  View standings, filter by category, and monitor live competition
                 </p>
-                <div style="margin-top: 12px; color: var(--color-primary); font-weight: 500;">
+                <div style="margin-top: 8px; color: var(--color-primary); font-weight: 500; font-size: 14px;">
                   View Results →
                 </div>
               </div>
@@ -159,16 +163,19 @@ function renderDashboard(stats) {
 
           <!-- Competition Settings -->
           <div class="card hover-card" id="nav-settings" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 16px;">
-              <div style="font-size: 40px;">⚙️</div>
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
+                <circle cx="12" cy="12" r="3" stroke="var(--color-primary)" stroke-width="2"/>
+                <path d="M12 1v6m0 6v6M1 12h6m6 0h6m-2.5 8.66l-5.2-3m5.2-11.32l-5.2 3m0 8.32l5.2 3m-5.2-11.32l5.2-3" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
               <div style="flex: 1;">
-                <h3 style="color: var(--text-primary); font-size: 20px; font-weight: 600; margin-bottom: 8px;">
+                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
                   Competition Settings
                 </h3>
-                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
-                  Manage scoring windows, override times for teams, and control competition parameters
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                  Manage scoring windows and control competition parameters
                 </p>
-                <div style="margin-top: 12px; color: var(--color-primary); font-weight: 500;">
+                <div style="margin-top: 8px; color: var(--color-primary); font-weight: 500; font-size: 14px;">
                   Settings →
                 </div>
               </div>

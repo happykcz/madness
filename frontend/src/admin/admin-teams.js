@@ -49,18 +49,18 @@ export async function renderTeamManagement() {
  */
 function renderHeader() {
   return `
-    <div class="header" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 40px;" />
-        <h1 style="color: white; font-size: 18px; font-weight: 600; margin: 0;">
+    <div class="header" style="padding: 12px 16px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
+        <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
           Team Management
         </h1>
       </div>
-      <div style="display: flex; gap: 12px; align-items: center;">
-        <button id="back-to-dashboard" class="btn btn-secondary">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
           ← Dashboard
         </button>
-        <button id="admin-signout" class="btn btn-secondary">
+        <button id="admin-signout" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
           Sign Out
         </button>
       </div>
@@ -133,69 +133,58 @@ function renderEmptyState() {
 }
 
 /**
- * Render teams table
+ * Render teams table (mobile-friendly cards)
  */
 function renderTeamsTable(teams) {
   return `
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: var(--bg-primary); border-bottom: 1px solid #e1e4e8;">
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Team ID</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Team Name</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Category</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Members</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Created</th>
-            <th style="padding: 12px 16px; text-align: right; font-weight: 600; color: var(--text-primary);">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${teams.map(team => `
-            <tr style="border-bottom: 1px solid #e1e4e8;" class="team-row">
-              <td style="padding: 12px 16px;">
-                <code style="background-color: #f6f8fa; padding: 2px 6px; border-radius: 3px; font-size: 13px;">
-                  ${team.team_id}
-                </code>
-              </td>
-              <td style="padding: 12px 16px; font-weight: 500;">${team.team_name}</td>
-              <td style="padding: 12px 16px;">
-                <span style="
-                  display: inline-block;
-                  padding: 2px 8px;
-                  background-color: ${getCategoryColor(team.category)};
-                  color: white;
-                  border-radius: 12px;
-                  font-size: 12px;
-                  text-transform: capitalize;
-                ">
-                  ${team.category}
-                </span>
-              </td>
-              <td style="padding: 12px 16px; color: var(--text-secondary);">${team.climbers?.length || 0} climbers</td>
-              <td style="padding: 12px 16px; color: var(--text-secondary); font-size: 13px;">
-                ${new Date(team.created_at).toLocaleDateString()}
-              </td>
-              <td style="padding: 12px 16px; text-align: right;">
-                <button
-                  class="btn-view-team"
-                  data-team-id="${team.id}"
-                  style="
-                    padding: 6px 12px;
-                    background-color: var(--color-primary);
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-size: 13px;
-                  "
-                >
-                  View Details
-                </button>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+    <div style="display: grid; gap: 12px;">
+      ${teams.map(team => `
+        <div class="card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 16px; color: var(--text-primary); margin-bottom: 4px;">
+                ${team.team_name}
+              </div>
+              <code style="background-color: #f6f8fa; padding: 2px 6px; border-radius: 3px; font-size: 12px;">
+                ${team.team_id}
+              </code>
+            </div>
+            <span style="
+              display: inline-block;
+              padding: 4px 10px;
+              background-color: ${getCategoryColor(team.category)};
+              color: white;
+              border-radius: 12px;
+              font-size: 12px;
+              text-transform: capitalize;
+              white-space: nowrap;
+            ">
+              ${team.category}
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #e1e4e8;">
+            <div style="font-size: 13px; color: var(--text-secondary);">
+              ${team.climbers?.length || 0} climbers • ${new Date(team.created_at).toLocaleDateString()}
+            </div>
+            <button
+              class="btn-view-team"
+              data-team-id="${team.id}"
+              style="
+                padding: 6px 12px;
+                background-color: var(--color-primary);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 13px;
+                white-space: nowrap;
+              "
+            >
+              View
+            </button>
+          </div>
+        </div>
+      `).join('')}
     </div>
   `
 }
