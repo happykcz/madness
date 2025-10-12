@@ -233,12 +233,18 @@ SET
 WHERE tick_number IS NULL;
 
 -- Set default sector_order and route_order for existing routes
+WITH numbered_routes AS (
+  SELECT id, row_number() OVER (ORDER BY name) as rn
+  FROM routes
+  WHERE sector IS NULL
+)
 UPDATE routes
 SET
   sector = 'Main Area',
   sector_order = 0,
-  route_order = row_number() OVER (ORDER BY name)
-WHERE sector IS NULL;
+  route_order = numbered_routes.rn
+FROM numbered_routes
+WHERE routes.id = numbered_routes.id;
 
 -- ============================================================================
 -- 7. GRANT PERMISSIONS
