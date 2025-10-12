@@ -8,6 +8,7 @@
 import { authManager } from '../auth/auth-manager.js'
 import { supabase } from '../lib/supabase.js'
 import { showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
+import { renderScoring } from './scoring.js'
 
 /**
  * Render team dashboard
@@ -215,27 +216,9 @@ function renderDashboardContent(data) {
 
         <!-- Action Buttons -->
         <div style="margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="alert('Log Ascent feature coming in Phase 4!')">
-            Log Ascent
+          <button id="goto-scoring" class="btn btn-primary">
+            📊 Start Scoring
           </button>
-          <button class="btn btn-secondary" onclick="alert('View Routes feature coming in Phase 4!')">
-            View Routes
-          </button>
-        </div>
-
-        <!-- Info Box -->
-        <div style="
-          margin-top: 32px;
-          padding: 16px;
-          background-color: #d1ecf1;
-          border: 1px solid #bee5eb;
-          border-radius: 6px;
-          color: #0c5460;
-          font-size: 14px;
-        ">
-          <strong>✅ Phase 3 Complete:</strong> Team authentication is working! You're now logged in as ${team.team_name}.
-          <br><br>
-          <strong>🚧 Coming in Phase 4:</strong> Route logging, real-time scoring, and ascent tracking.
         </div>
       </main>
     </div>
@@ -244,6 +227,11 @@ function renderDashboardContent(data) {
   // Re-attach sign out handler
   document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
     await authManager.signOut()
+  })
+
+  // Setup scoring button
+  document.getElementById('goto-scoring')?.addEventListener('click', async () => {
+    await renderScoring(data.team, data.climbers, data.climberScores)
   })
 }
 
