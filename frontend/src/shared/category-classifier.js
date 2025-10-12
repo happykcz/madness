@@ -54,12 +54,12 @@ export function classifyTeam(climber1, climber2) {
   const { age: age1, redpointGrade: grade1 } = climber1
   const { age: age2, redpointGrade: grade2 } = climber2
 
-  // Masters category: any climber over 50, or both over 45
-  if (age1 > 50 || age2 > 50) {
+  // Masters category: any climber 50+, or both 45+
+  if (age1 >= 50 || age2 >= 50) {
     return TEAM_CATEGORIES.MASTERS
   }
 
-  if (age1 > 45 && age2 > 45) {
+  if (age1 >= 45 && age2 >= 45) {
     return TEAM_CATEGORIES.MASTERS
   }
 
@@ -99,7 +99,7 @@ export function getCategoryDisplayName(category) {
 export function getCategoryDescription(category, isTeam = false) {
   if (isTeam) {
     const descriptions = {
-      'masters': 'Any climber over 50, or both over 45',
+      'masters': 'Any climber 50+, or both 45+',
       'recreational': 'Strongest climber redpoints up to 19',
       'intermediate': 'Strongest climber redpoints 20-23',
       'advanced': 'Strongest climber redpoints 24+',

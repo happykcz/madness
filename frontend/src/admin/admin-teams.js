@@ -8,7 +8,7 @@
 import { router } from '../lib/router.js'
 import { supabase } from '../lib/supabase.js'
 import { showSuccess, showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
-import { classifyTeam } from '../shared/category-classifier.js'
+import { classifyTeam, classifyClimber } from '../shared/category-classifier.js'
 
 let currentView = 'list' // 'list', 'create', 'view'
 let selectedTeam = null
@@ -21,11 +21,11 @@ export async function renderTeamManagement() {
 
   // Show loading
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       ${renderHeader()}
       <div style="text-align: center; padding: 40px;">
         <div class="spinner"></div>
-        <p style="color: #586069; margin-top: 16px;">Loading teams...</p>
+        <p style="color: var(--text-secondary); margin-top: 16px;">Loading teams...</p>
       </div>
     </div>
   `
@@ -57,10 +57,10 @@ function renderHeader() {
         </h1>
       </div>
       <div style="display: flex; gap: 12px; align-items: center;">
-        <button id="back-to-dashboard" class="btn" style="background-color: #444d56; color: white;">
+        <button id="back-to-dashboard" class="btn btn-secondary">
           ← Dashboard
         </button>
-        <button id="admin-signout" class="btn" style="background-color: #444d56; color: white;">
+        <button id="admin-signout" class="btn btn-secondary">
           Sign Out
         </button>
       </div>
@@ -86,17 +86,17 @@ async function renderTeamList() {
   if (error) throw error
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       ${renderHeader()}
 
       <div style="max-width: 1280px; margin: 0 auto; padding: 40px 24px;">
         <!-- Page Title and Actions -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
           <div>
-            <h2 style="color: #24292e; font-size: 28px; font-weight: 600; margin-bottom: 8px;">
+            <h2 style="color: var(--text-primary); font-size: 28px; font-weight: 600; margin-bottom: 8px;">
               Teams (${teams.length})
             </h2>
-            <p style="color: #586069;">
+            <p style="color: var(--text-secondary);">
               Manage team registrations and credentials
             </p>
           </div>
@@ -121,8 +121,8 @@ function renderEmptyState() {
   return `
     <div class="card" style="text-align: center; padding: 60px 40px;">
       <div style="font-size: 64px; margin-bottom: 16px;">👥</div>
-      <h3 style="color: #24292e; font-size: 20px; margin-bottom: 8px;">No teams yet</h3>
-      <p style="color: #586069; margin-bottom: 24px;">
+      <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 8px;">No teams yet</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">
         Create your first team to get started with the competition
       </p>
       <button id="create-first-team" class="btn btn-primary">
@@ -140,13 +140,13 @@ function renderTeamsTable(teams) {
     <div class="card" style="padding: 0; overflow: hidden;">
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
-          <tr style="background-color: #fafbfc; border-bottom: 1px solid #e1e4e8;">
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #24292e;">Team ID</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #24292e;">Team Name</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #24292e;">Category</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #24292e;">Members</th>
-            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #24292e;">Created</th>
-            <th style="padding: 12px 16px; text-align: right; font-weight: 600; color: #24292e;">Actions</th>
+          <tr style="background-color: var(--bg-primary); border-bottom: 1px solid #e1e4e8;">
+            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Team ID</th>
+            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Team Name</th>
+            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Category</th>
+            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Members</th>
+            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text-primary);">Created</th>
+            <th style="padding: 12px 16px; text-align: right; font-weight: 600; color: var(--text-primary);">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -171,8 +171,8 @@ function renderTeamsTable(teams) {
                   ${team.category}
                 </span>
               </td>
-              <td style="padding: 12px 16px; color: #586069;">${team.climbers?.length || 0} climbers</td>
-              <td style="padding: 12px 16px; color: #586069; font-size: 13px;">
+              <td style="padding: 12px 16px; color: var(--text-secondary);">${team.climbers?.length || 0} climbers</td>
+              <td style="padding: 12px 16px; color: var(--text-secondary); font-size: 13px;">
                 ${new Date(team.created_at).toLocaleDateString()}
               </td>
               <td style="padding: 12px 16px; text-align: right;">
@@ -181,7 +181,7 @@ function renderTeamsTable(teams) {
                   data-team-id="${team.id}"
                   style="
                     padding: 6px 12px;
-                    background-color: #0366d6;
+                    background-color: var(--color-primary);
                     color: white;
                     border: none;
                     border-radius: 6px;
@@ -207,7 +207,7 @@ function getCategoryColor(category) {
   const colors = {
     masters: '#6f42c1',
     recreational: '#28a745',
-    intermediate: '#0366d6',
+    intermediate: 'var(--color-primary)',
     advanced: '#d73a49'
   }
   return colors[category] || '#6c757d'
@@ -220,7 +220,7 @@ function renderCreateTeamForm() {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       ${renderHeader()}
 
       <div style="max-width: 800px; margin: 0 auto; padding: 40px 24px;">
@@ -231,14 +231,14 @@ function renderCreateTeamForm() {
 
         <!-- Form Card -->
         <div class="card">
-          <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 24px;">
+          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 24px;">
             Create New Team
           </h2>
 
           <form id="create-team-form">
             <!-- Team ID -->
             <div style="margin-bottom: 20px;">
-              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                 Team ID <span style="color: #d73a49;">*</span>
               </label>
               <input
@@ -252,20 +252,20 @@ function renderCreateTeamForm() {
                 style="
                   width: 100%;
                   padding: 8px 12px;
-                  border: 1px solid #d1d5da;
+                  border: 1px solid var(--border-primary);
                   border-radius: 6px;
                   font-size: 14px;
                   box-sizing: border-box;
                 "
               />
-              <p style="color: #586069; font-size: 12px; margin-top: 4px;">
+              <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
                 Used for login. 3-50 characters, alphanumeric and underscore only (e.g., Jeff_Peter, AliceAndBob)
               </p>
             </div>
 
             <!-- Team Name -->
             <div style="margin-bottom: 20px;">
-              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                 Team Name <span style="color: #d73a49;">*</span>
               </label>
               <input
@@ -278,7 +278,7 @@ function renderCreateTeamForm() {
                 style="
                   width: 100%;
                   padding: 8px 12px;
-                  border: 1px solid #d1d5da;
+                  border: 1px solid var(--border-primary);
                   border-radius: 6px;
                   font-size: 14px;
                   box-sizing: border-box;
@@ -288,7 +288,7 @@ function renderCreateTeamForm() {
 
             <!-- Password -->
             <div style="margin-bottom: 20px;">
-              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                 Password <span style="color: #d73a49;">*</span>
               </label>
               <input
@@ -300,13 +300,13 @@ function renderCreateTeamForm() {
                 style="
                   width: 100%;
                   padding: 8px 12px;
-                  border: 1px solid #d1d5da;
+                  border: 1px solid var(--border-primary);
                   border-radius: 6px;
                   font-size: 14px;
                   box-sizing: border-box;
                 "
               />
-              <p style="color: #586069; font-size: 12px; margin-top: 4px;">
+              <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
                 Default: 12qm2025 (can be customized)
               </p>
             </div>
@@ -314,13 +314,13 @@ function renderCreateTeamForm() {
             <hr style="border: none; border-top: 1px solid #e1e4e8; margin: 32px 0;" />
 
             <!-- Climber 1 -->
-            <h3 style="color: #24292e; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
               Climber 1
             </h3>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Name <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -331,7 +331,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -339,7 +339,7 @@ function renderCreateTeamForm() {
                 />
               </div>
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Age <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -352,7 +352,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -360,7 +360,7 @@ function renderCreateTeamForm() {
                 />
               </div>
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Grade <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -374,7 +374,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -384,13 +384,13 @@ function renderCreateTeamForm() {
             </div>
 
             <!-- Climber 2 -->
-            <h3 style="color: #24292e; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
               Climber 2
             </h3>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 32px;">
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Name <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -401,7 +401,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -409,7 +409,7 @@ function renderCreateTeamForm() {
                 />
               </div>
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Age <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -422,7 +422,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -430,7 +430,7 @@ function renderCreateTeamForm() {
                 />
               </div>
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
                   Grade <span style="color: #d73a49;">*</span>
                 </label>
                 <input
@@ -444,7 +444,7 @@ function renderCreateTeamForm() {
                   style="
                     width: 100%;
                     padding: 8px 12px;
-                    border: 1px solid #d1d5da;
+                    border: 1px solid var(--border-primary);
                     border-radius: 6px;
                     font-size: 14px;
                     box-sizing: border-box;
@@ -625,7 +625,7 @@ function showTeamCredentials(teamId, password, teamName) {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       ${renderHeader()}
 
       <div style="max-width: 600px; margin: 0 auto; padding: 40px 24px;">
@@ -635,24 +635,24 @@ function showTeamCredentials(teamId, password, teamName) {
           <h2 style="color: #28a745; font-size: 24px; font-weight: 600; margin-bottom: 8px;">
             Team Created Successfully!
           </h2>
-          <p style="color: #586069; margin-bottom: 32px;">
+          <p style="color: var(--text-secondary); margin-bottom: 32px;">
             ${teamName} is ready to compete
           </p>
 
           <!-- Credentials Box -->
           <div style="
             background-color: #f6f8fa;
-            border: 2px solid #0366d6;
+            border: 2px solid var(--color-primary);
             border-radius: 6px;
             padding: 24px;
             margin-bottom: 24px;
             text-align: left;
           ">
-            <h3 style="color: #24292e; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
               🔑 Login Credentials
             </h3>
             <div style="margin-bottom: 12px;">
-              <div style="color: #586069; font-size: 13px; margin-bottom: 4px;">Team ID:</div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Team ID:</div>
               <code style="
                 display: block;
                 background-color: white;
@@ -663,7 +663,7 @@ function showTeamCredentials(teamId, password, teamName) {
               ">${teamId}</code>
             </div>
             <div style="margin-bottom: 12px;">
-              <div style="color: #586069; font-size: 13px; margin-bottom: 4px;">Password:</div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Password:</div>
               <code style="
                 display: block;
                 background-color: white;
@@ -674,7 +674,7 @@ function showTeamCredentials(teamId, password, teamName) {
               ">${password}</code>
             </div>
             <div>
-              <div style="color: #586069; font-size: 13px; margin-bottom: 4px;">Login URL:</div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Login URL:</div>
               <code style="
                 display: block;
                 background-color: white;
@@ -758,34 +758,39 @@ async function renderTeamDetail(teamId) {
   }
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       ${renderHeader()}
 
       <div style="max-width: 800px; margin: 0 auto; padding: 40px 24px;">
-        <button id="back-to-list" class="btn" style="margin-bottom: 24px;">
-          ← Back to Teams
-        </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <button id="back-to-list" class="btn">
+            ← Back to Teams
+          </button>
+          <button id="edit-team-btn" class="btn btn-primary">
+            ✏️ Edit Team
+          </button>
+        </div>
 
         <!-- Team Info Card -->
         <div class="card" style="margin-bottom: 24px;">
-          <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 24px;">
+          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 24px;">
             ${team.team_name}
           </h2>
 
           <!-- Credentials -->
           <div style="background-color: #f6f8fa; padding: 16px; border-radius: 6px; margin-bottom: 24px;">
-            <h3 style="color: #24292e; font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+            <h3 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 12px;">
               🔑 Login Credentials
             </h3>
             <div style="margin-bottom: 8px;">
-              <span style="color: #586069;">Team ID:</span>
+              <span style="color: var(--text-secondary);">Team ID:</span>
               <code style="background-color: white; padding: 2px 6px; border-radius: 3px; margin-left: 8px;">
                 ${team.team_id}
               </code>
             </div>
             <div style="margin-bottom: 12px;">
-              <span style="color: #586069;">Password:</span>
-              <span style="color: #586069; font-style: italic; margin-left: 8px;">
+              <span style="color: var(--text-secondary);">Password:</span>
+              <span style="color: var(--text-secondary); font-style: italic; margin-left: 8px;">
                 Contact admin to reset
               </span>
               <button id="reset-password-btn" class="btn" style="padding: 4px 8px; font-size: 12px; margin-left: 8px; opacity: 0.5;" disabled title="Feature temporarily disabled">
@@ -797,7 +802,7 @@ async function renderTeamDetail(teamId) {
           <!-- Team Info -->
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
             <div>
-              <div style="color: #586069; font-size: 13px; margin-bottom: 4px;">Category</div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Category</div>
               <span style="
                 display: inline-block;
                 padding: 4px 12px;
@@ -811,13 +816,13 @@ async function renderTeamDetail(teamId) {
               </span>
             </div>
             <div>
-              <div style="color: #586069; font-size: 13px; margin-bottom: 4px;">Created</div>
-              <div style="color: #24292e;">${new Date(team.created_at).toLocaleString()}</div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Created</div>
+              <div style="color: var(--text-primary);">${new Date(team.created_at).toLocaleString()}</div>
             </div>
           </div>
 
           <!-- Climbers -->
-          <h3 style="color: #24292e; font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+          <h3 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 12px;">
             Team Members
           </h3>
           ${team.climbers.map(climber => `
@@ -831,8 +836,8 @@ async function renderTeamDetail(teamId) {
               align-items: center;
             ">
               <div>
-                <div style="font-weight: 500; color: #24292e;">${climber.name}</div>
-                <div style="font-size: 13px; color: #586069;">
+                <div style="font-weight: 500; color: var(--text-primary);">${climber.name}</div>
+                <div style="font-size: 13px; color: var(--text-secondary);">
                   Age ${climber.age} • Grade ${climber.redpoint_grade} • ${climber.category}
                 </div>
               </div>
@@ -853,6 +858,10 @@ function setupTeamDetailListeners(team) {
   document.getElementById('back-to-list')?.addEventListener('click', () => {
     currentView = 'list'
     renderTeamManagement()
+  })
+
+  document.getElementById('edit-team-btn')?.addEventListener('click', () => {
+    showEditTeamModal(team)
   })
 
   document.getElementById('show-password')?.addEventListener('click', () => {
@@ -942,4 +951,356 @@ function setupTeamDetailListeners(team) {
     await supabase.auth.signOut()
     router.navigate('/')
   })
+}
+
+/**
+ * Show edit team modal
+ */
+function showEditTeamModal(team) {
+  // Create modal overlay
+  const modal = document.createElement('div')
+  modal.id = 'edit-team-modal'
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  `
+
+  modal.innerHTML = `
+    <div class="card" style="
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin: 0;">
+          Edit Team
+        </h2>
+        <button id="close-modal" class="btn" style="padding: 4px 12px;">
+          ✕
+        </button>
+      </div>
+
+      <form id="edit-team-form">
+        <!-- Team Name -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+            Team Name
+          </label>
+          <input
+            type="text"
+            id="edit-team-name"
+            value="${team.team_name}"
+            required
+            style="
+              width: 100%;
+              padding: 8px 12px;
+              border: 1px solid var(--border-primary);
+              border-radius: 6px;
+              font-size: 14px;
+              box-sizing: border-box;
+              background-color: var(--bg-secondary);
+            "
+          />
+        </div>
+
+        <!-- Team ID (read-only) -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+            Team ID (cannot be changed)
+          </label>
+          <input
+            type="text"
+            value="${team.team_id}"
+            disabled
+            style="
+              width: 100%;
+              padding: 8px 12px;
+              border: 1px solid var(--border-primary);
+              border-radius: 6px;
+              font-size: 14px;
+              box-sizing: border-box;
+              background-color: #f6f8fa;
+              color: var(--text-secondary);
+            "
+          />
+        </div>
+
+        <!-- Climber 1 -->
+        <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+          Climber 1
+        </h3>
+        <div style="background-color: #f6f8fa; padding: 16px; border-radius: 6px; margin-bottom: 20px;">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+              Name
+            </label>
+            <input
+              type="text"
+              id="edit-climber1-name"
+              value="${team.climbers[0].name}"
+              required
+              style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid var(--border-primary);
+                border-radius: 6px;
+                font-size: 14px;
+                box-sizing: border-box;
+                background-color: white;
+              "
+            />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+                Age
+              </label>
+              <input
+                type="number"
+                id="edit-climber1-age"
+                value="${team.climbers[0].age}"
+                min="10"
+                max="100"
+                required
+                style="
+                  width: 100%;
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-primary);
+                  border-radius: 6px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                  background-color: white;
+                "
+              />
+            </div>
+            <div>
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+                Grade (Ewbank)
+              </label>
+              <input
+                type="number"
+                id="edit-climber1-grade"
+                value="${team.climbers[0].redpoint_grade}"
+                min="10"
+                max="35"
+                required
+                style="
+                  width: 100%;
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-primary);
+                  border-radius: 6px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                  background-color: white;
+                "
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Climber 2 -->
+        <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+          Climber 2
+        </h3>
+        <div style="background-color: #f6f8fa; padding: 16px; border-radius: 6px; margin-bottom: 24px;">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+              Name
+            </label>
+            <input
+              type="text"
+              id="edit-climber2-name"
+              value="${team.climbers[1].name}"
+              required
+              style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid var(--border-primary);
+                border-radius: 6px;
+                font-size: 14px;
+                box-sizing: border-box;
+                background-color: white;
+              "
+            />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+                Age
+              </label>
+              <input
+                type="number"
+                id="edit-climber2-age"
+                value="${team.climbers[1].age}"
+                min="10"
+                max="100"
+                required
+                style="
+                  width: 100%;
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-primary);
+                  border-radius: 6px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                  background-color: white;
+                "
+              />
+            </div>
+            <div>
+              <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+                Grade (Ewbank)
+              </label>
+              <input
+                type="number"
+                id="edit-climber2-grade"
+                value="${team.climbers[1].redpoint_grade}"
+                min="10"
+                max="35"
+                required
+                style="
+                  width: 100%;
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-primary);
+                  border-radius: 6px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                  background-color: white;
+                "
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" id="cancel-edit" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  `
+
+  document.body.appendChild(modal)
+
+  // Setup event listeners
+  const closeModal = () => {
+    modal.remove()
+  }
+
+  document.getElementById('close-modal').addEventListener('click', closeModal)
+  document.getElementById('cancel-edit').addEventListener('click', closeModal)
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal()
+    }
+  })
+
+  // Handle form submission
+  document.getElementById('edit-team-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    await handleEditTeamSubmit(team, closeModal)
+  })
+}
+
+/**
+ * Handle edit team form submission
+ */
+async function handleEditTeamSubmit(originalTeam, closeModal) {
+  try {
+    showLoading('Saving changes...')
+
+    // Get form values
+    const teamName = document.getElementById('edit-team-name').value.trim()
+    const climber1Name = document.getElementById('edit-climber1-name').value.trim()
+    const climber1Age = parseInt(document.getElementById('edit-climber1-age').value)
+    const climber1Grade = parseInt(document.getElementById('edit-climber1-grade').value)
+    const climber2Name = document.getElementById('edit-climber2-name').value.trim()
+    const climber2Age = parseInt(document.getElementById('edit-climber2-age').value)
+    const climber2Grade = parseInt(document.getElementById('edit-climber2-grade').value)
+
+    // Validate inputs
+    if (!teamName || !climber1Name || !climber2Name) {
+      throw new Error('All name fields are required')
+    }
+
+    if (climber1Age < 10 || climber1Age > 100 || climber2Age < 10 || climber2Age > 100) {
+      throw new Error('Age must be between 10 and 100')
+    }
+
+    if (climber1Grade < 10 || climber1Grade > 35 || climber2Grade < 10 || climber2Grade > 35) {
+      throw new Error('Grade must be between 10 and 35 (Ewbank)')
+    }
+
+    // Calculate new categories using classifyClimber for individual climbers
+    const climber1IndividualCategory = classifyClimber(climber1Grade)
+    const climber2IndividualCategory = classifyClimber(climber2Grade)
+    
+    // Calculate new team category
+    const teamCategory = classifyTeam(
+      { age: climber1Age, redpointGrade: climber1Grade },
+      { age: climber2Age, redpointGrade: climber2Grade }
+    )
+
+    // Update team name and category
+    const { error: teamError } = await supabase
+      .from('teams')
+      .update({ team_name: teamName, category: teamCategory })
+      .eq('id', originalTeam.id)
+
+    if (teamError) throw teamError
+
+    // Update climber 1
+    const { error: climber1Error } = await supabase
+      .from('climbers')
+      .update({
+        name: climber1Name,
+        age: climber1Age,
+        redpoint_grade: climber1Grade,
+        category: climber1IndividualCategory
+      })
+      .eq('id', originalTeam.climbers[0].id)
+
+    if (climber1Error) throw climber1Error
+
+    // Update climber 2
+    const { error: climber2Error } = await supabase
+      .from('climbers')
+      .update({
+        name: climber2Name,
+        age: climber2Age,
+        redpoint_grade: climber2Grade,
+        category: climber2IndividualCategory
+      })
+      .eq('id', originalTeam.climbers[1].id)
+
+    if (climber2Error) throw climber2Error
+
+    hideLoading()
+    showSuccess('Team updated successfully!')
+    closeModal()
+
+    // Reload team detail view
+    await renderTeamDetail(originalTeam.id)
+
+  } catch (error) {
+    hideLoading()
+    showError('Error updating team: ' + error.message)
+  }
 }

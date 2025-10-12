@@ -16,15 +16,15 @@ export function renderLogin() {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
-    <div class="min-h-screen flex items-center justify-center" style="background-color: #fafbfc; padding: 20px;">
+    <div class="min-h-screen flex items-center justify-center" style="padding: 20px;">
       <div class="card" style="max-width: 450px; width: 100%;">
         <!-- CAWA Logo -->
         <div style="text-align: center; margin-bottom: 32px;">
           <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
-          <h1 style="color: #24292e; font-size: 24px; font-weight: 600; margin-top: 16px;">
+          <h1 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-top: 16px;">
             Quarry Madness
           </h1>
-          <p style="color: #586069; font-size: 14px; margin-top: 8px;">
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">
             Team Sign In
           </p>
         </div>
@@ -33,7 +33,7 @@ export function renderLogin() {
         <form id="login-form" style="margin-bottom: 24px;">
           <!-- Team ID Input -->
           <div style="margin-bottom: 16px;">
-            <label for="team-id" style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e; font-size: 14px;">
+            <label for="team-id" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
               Team ID
             </label>
             <input
@@ -46,18 +46,18 @@ export function renderLogin() {
               style="
                 width: 100%;
                 padding: 8px 12px;
-                border: 1px solid #d1d5da;
+                border: 1px solid var(--border-primary);
                 border-radius: 6px;
                 font-size: 14px;
                 box-sizing: border-box;
-                background-color: #fafbfc;
+                background-color: var(--bg-secondary);
               "
             />
           </div>
 
           <!-- Password Input -->
           <div style="margin-bottom: 16px;">
-            <label for="password" style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e; font-size: 14px;">
+            <label for="password" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
               Password
             </label>
             <div style="position: relative;">
@@ -71,11 +71,11 @@ export function renderLogin() {
                 style="
                   width: 100%;
                   padding: 8px 40px 8px 12px;
-                  border: 1px solid #d1d5da;
+                  border: 1px solid var(--border-primary);
                   border-radius: 6px;
                   font-size: 14px;
                   box-sizing: border-box;
-                  background-color: #fafbfc;
+                  background-color: var(--bg-secondary);
                 "
               />
               <button
@@ -88,7 +88,7 @@ export function renderLogin() {
                   transform: translateY(-50%);
                   background: none;
                   border: none;
-                  color: #586069;
+                  color: var(--text-secondary);
                   cursor: pointer;
                   padding: 4px 8px;
                   font-size: 12px;
@@ -122,7 +122,7 @@ export function renderLogin() {
         <div style="text-align: center;">
           <a
             href="#/"
-            style="color: #0366d6; text-decoration: none; font-size: 14px;"
+            style="color: var(--color-tertiary); text-decoration: none; font-size: 14px;"
           >
             ← Back to Home
           </a>

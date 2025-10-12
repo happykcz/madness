@@ -1,6 +1,29 @@
 @import "tailwindcss";
 
 /* Competition-specific custom styles */
+:root {
+  /* Theme Colors */
+  --color-primary: #ff0046;        /* CAWA dark pink */
+  --color-primary-hover: #cc0038;
+  --color-primary-active: #b30032;
+  --color-secondary: #444d56;      /* dark gray */
+  --color-tertiary: #6a737d;       /* medium gray */
+
+  /* Backgrounds */
+  --bg-primary: #fff5f7;           /* light pink */
+  --bg-secondary: #fafbfc;         /* light gray */
+  --bg-white: #ffffff;
+
+  /* Text Colors */
+  --text-primary: #24292e;
+  --text-secondary: #586069;
+  --text-muted: #959da5;
+
+  /* Borders */
+  --border-primary: #d1d5da;
+  --border-secondary: #e1e4e8;
+}
+
 @layer base {
   /* Mobile-first typography for climbing competition */
   html {
@@ -11,8 +34,8 @@
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    color: #24292e;
-    background-color: #ffffff;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
     line-height: 1.5;
   }
 }
@@ -33,31 +56,31 @@
   }
 
   .btn-primary {
-    background-color: #ff0046;
+    background-color: var(--color-primary);
     border-color: rgba(27, 31, 36, 0.15);
     color: white;
     box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
   }
 
   .btn-primary:hover {
-    background-color: #cc0038;
+    background-color: var(--color-primary-hover);
   }
 
   .btn-primary:active {
-    background-color: #b30032;
+    background-color: var(--color-primary-active);
     box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15);
   }
 
   .btn-secondary {
-    background-color: #fafbfc;
-    border-color: rgba(27, 31, 36, 0.15);
-    color: #24292e;
+    background-color: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
     box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
   }
 
   .btn-secondary:hover {
     background-color: #f3f4f6;
-    border-color: rgba(27, 31, 36, 0.15);
+    border-color: var(--border-primary);
   }
 
   .btn-secondary:active {
@@ -67,24 +90,24 @@
 
   /* GitHub-style card */
   .card {
-    background-color: #ffffff;
-    border: 1px solid #d1d5da;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-primary);
     border-radius: 6px;
     padding: 16px;
   }
 
   /* Score display card */
   .score-card {
-    background-color: white;
+    background-color: var(--bg-white);
     border-radius: 6px;
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--border-secondary);
     padding: 16px;
   }
 
   /* Route item in list - GitHub style */
   .route-item {
-    background-color: white;
-    border: 1px solid #e1e4e8;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
     margin-bottom: 8px;
@@ -92,7 +115,7 @@
   }
 
   .route-item:hover {
-    background-color: #f6f8fa;
+    background-color: var(--bg-secondary);
   }
 
   .route-item:active {
@@ -101,8 +124,8 @@
 
   /* GitHub-style header */
   .header {
-    background-color: #24292e;
-    border-bottom: 1px solid #444d56;
+    background-color: var(--color-secondary);
+    border-bottom: 1px solid var(--color-tertiary);
     padding: 16px;
   }
 

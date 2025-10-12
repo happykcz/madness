@@ -28,10 +28,10 @@ const V_GRADE_POINTS = {
 }
 
 /**
- * Repeat penalty multipliers
- * FR-007: 1st=100%, 2nd=75%, 3rd=25%, 4th+=0%
+ * Tick multipliers for multiple ticks of same route
+ * Updated for Sprint 1: 1st=100%, 2nd=75%, 3rd=50%, 4th=25%, 5th+=0%
  */
-const REPEAT_PENALTIES = [1.0, 0.75, 0.25, 0]
+const TICK_MULTIPLIERS = [1.0, 0.75, 0.50, 0.25, 0]
 
 /**
  * Calculate base points for a route based on grade and gear type
@@ -67,17 +67,54 @@ export function calculateBasePoints(grade, gearType) {
 }
 
 /**
+ * Get tick multiplier for a specific tick number
+ * @param {number} tickNumber - Which tick this is (1-based: 1, 2, 3, 4, 5+)
+ * @returns {number} Multiplier (1.00, 0.75, 0.50, 0.25, or 0.00)
+ */
+export function getTickMultiplier(tickNumber) {
+  if (tickNumber < 1) return 0
+
+  // 5th+ tick gets 0 points
+  const multiplierIndex = Math.min(tickNumber - 1, TICK_MULTIPLIERS.length - 1)
+  return TICK_MULTIPLIERS[multiplierIndex]
+}
+
+/**
+ * Calculate points for a single tick of a route
+ * @param {number} routeBasePoints - Manually set base points for this route
+ * @param {number} tickNumber - Which tick this is (1-based: 1, 2, 3, 4, 5+)
+ * @param {boolean} isTrad - Whether this is a trad route (for 50% bonus)
+ * @returns {number} Points for this tick
+ */
+export function calculateTickPoints(routeBasePoints, tickNumber, isTrad = false) {
+  if (routeBasePoints === 0) return 0 // Zero-point navigation routes
+  if (tickNumber < 1) return 0
+  if (tickNumber > 4) return 0 // 5th+ tick scores 0
+
+  const tickMultiplier = getTickMultiplier(tickNumber)
+  let points = routeBasePoints * tickMultiplier
+
+  // Apply trad bonus to this tick
+  if (isTrad) {
+    points = points * 1.5 // 50% bonus
+  }
+
+  return Math.round(points)
+}
+
+/**
  * Calculate points for an ascent considering repeat penalties
  * @param {number} basePoints - Base points for the route
  * @param {number} attemptNumber - Which attempt this is (1-based: 1, 2, 3, 4+)
  * @returns {number} Points after repeat penalty
+ * @deprecated Use calculateTickPoints instead for new tick-based system
  */
 export function calculateAscentPoints(basePoints, attemptNumber) {
   if (attemptNumber < 1) return 0
 
-  // FR-007: Diminishing returns - 4th+ attempts get 0 points
-  const penaltyIndex = Math.min(attemptNumber - 1, REPEAT_PENALTIES.length - 1)
-  const multiplier = REPEAT_PENALTIES[penaltyIndex]
+  // Use new tick multipliers
+  const penaltyIndex = Math.min(attemptNumber - 1, TICK_MULTIPLIERS.length - 1)
+  const multiplier = TICK_MULTIPLIERS[penaltyIndex]
 
   return Math.round(basePoints * multiplier)
 }
@@ -235,6 +272,8 @@ export function formatGrade(grade, gearType) {
 export default {
   calculateBasePoints,
   calculateAscentPoints,
+  calculateTickPoints,
+  getTickMultiplier,
   calculateClimberTotal,
   calculateTeamScore,
   isWithinScoringWindow,

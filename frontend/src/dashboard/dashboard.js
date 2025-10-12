@@ -17,7 +17,7 @@ export async function renderDashboard() {
 
   // Show loading while fetching data
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" >
       <header class="header">
         <div class="container">
           <div class="flex items-center justify-between">
@@ -34,7 +34,7 @@ export async function renderDashboard() {
 
       <main class="container" style="padding-top: 32px;">
         <div style="text-align: center; padding: 40px;">
-          <p style="color: #586069;">Loading your team data...</p>
+          <p style="color: var(--text-secondary);">Loading your team data...</p>
         </div>
       </main>
     </div>
@@ -128,7 +128,7 @@ function renderDashboardContent(data) {
   const totalAscents = teamScore?.total_ascents || 0
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       <header class="header">
         <div class="container">
           <div class="flex items-center justify-between">
@@ -148,10 +148,10 @@ function renderDashboardContent(data) {
         <div class="card" style="margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div>
-              <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 4px;">
+              <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 4px;">
                 ${team.team_name}
               </h2>
-              <p style="color: #586069; font-size: 14px;">
+              <p style="color: var(--text-secondary); font-size: 14px;">
                 Team ID: ${team.team_id} • Category: ${capitalizeFirst(team.category)}
               </p>
             </div>
@@ -159,28 +159,28 @@ function renderDashboardContent(data) {
               <div style="font-size: 32px; font-weight: 700; color: #ff0046;">
                 ${totalPoints}
               </div>
-              <div style="font-size: 14px; color: #586069;">
+              <div style="font-size: 14px; color: var(--text-secondary);">
                 Total Points
               </div>
             </div>
           </div>
 
-          <div style="padding-top: 16px; border-top: 1px solid #e1e4e8;">
+          <div style="padding-top: 16px; border-top: 1px solid var(--border-secondary);">
             <div style="display: flex; gap: 32px;">
               <div>
-                <div style="font-size: 20px; font-weight: 600; color: #24292e;">${totalAscents}</div>
-                <div style="font-size: 12px; color: #586069;">Total Ascents</div>
+                <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">${totalAscents}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Total Ascents</div>
               </div>
               <div>
-                <div style="font-size: 20px; font-weight: 600; color: #24292e;">${climbers.length}</div>
-                <div style="font-size: 12px; color: #586069;">Team Members</div>
+                <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">${climbers.length}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Team Members</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Climbers Section -->
-        <h3 style="color: #24292e; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+        <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 16px;">
           Team Members
         </h3>
 
@@ -193,10 +193,10 @@ function renderDashboardContent(data) {
             <div class="card" style="margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
-                  <h4 style="color: #24292e; font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                  <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
                     ${climber.name}
                   </h4>
-                  <p style="color: #586069; font-size: 14px;">
+                  <p style="color: var(--text-secondary); font-size: 14px;">
                     Age: ${climber.age} • Grade: ${climber.redpoint_grade} • Category: ${capitalizeFirst(climber.category)}
                   </p>
                 </div>
@@ -204,7 +204,7 @@ function renderDashboardContent(data) {
                   <div style="font-size: 24px; font-weight: 600; color: #ff0046;">
                     ${points}
                   </div>
-                  <div style="font-size: 12px; color: #586069;">
+                  <div style="font-size: 12px; color: var(--text-secondary);">
                     ${ascents} ascent${ascents !== 1 ? 's' : ''}
                   </div>
                 </div>
@@ -254,7 +254,7 @@ function renderError(message) {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
       <header class="header">
         <div class="container">
           <div class="flex items-center justify-between">
@@ -271,10 +271,10 @@ function renderError(message) {
 
       <main class="container" style="padding-top: 32px;">
         <div class="card max-w-2xl mx-auto text-center">
-          <h2 style="color: #24292e; font-size: 24px; font-weight: 600; margin-bottom: 16px;">
+          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 16px;">
             ❌ Error
           </h2>
-          <p style="color: #586069; margin-bottom: 24px;">
+          <p style="color: var(--text-secondary); margin-bottom: 24px;">
             ${message}
           </p>
           <button class="btn btn-primary" onclick="window.location.reload()">

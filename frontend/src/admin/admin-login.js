@@ -18,15 +18,15 @@ export function renderAdminLogin() {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
-    <div class="min-h-screen flex items-center justify-center" style="background-color: #fafbfc; padding: 20px;">
+    <div class="min-h-screen flex items-center justify-center" style="padding: 20px;">
       <div class="card" style="max-width: 450px; width: 100%;">
         <!-- CAWA Logo -->
         <div style="text-align: center; margin-bottom: 32px;">
           <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
-          <h1 style="color: #24292e; font-size: 24px; font-weight: 600; margin-top: 16px;">
+          <h1 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-top: 16px;">
             Admin Portal
           </h1>
-          <p style="color: #586069; font-size: 14px; margin-top: 8px;">
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">
             Team Management & Competition Control
           </p>
         </div>
@@ -35,7 +35,7 @@ export function renderAdminLogin() {
         <form id="admin-login-form" style="margin-bottom: 24px;">
           <!-- Username Input -->
           <div style="margin-bottom: 16px;">
-            <label for="admin-username" style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e; font-size: 14px;">
+            <label for="admin-username" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
               Admin Username
             </label>
             <input
@@ -48,21 +48,21 @@ export function renderAdminLogin() {
               style="
                 width: 100%;
                 padding: 8px 12px;
-                border: 1px solid #d1d5da;
+                border: 1px solid var(--border-primary);
                 border-radius: 6px;
                 font-size: 14px;
                 box-sizing: border-box;
-                background-color: #fafbfc;
+                background-color: var(--bg-secondary);
               "
             />
-            <p style="color: #586069; font-size: 12px; margin-top: 4px;">
+            <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
               Enter 'admin' or full email
             </p>
           </div>
 
           <!-- Password Input -->
           <div style="margin-bottom: 16px;">
-            <label for="admin-password" style="display: block; font-weight: 500; margin-bottom: 8px; color: #24292e; font-size: 14px;">
+            <label for="admin-password" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
               Password
             </label>
             <div style="position: relative;">
@@ -76,11 +76,11 @@ export function renderAdminLogin() {
                 style="
                   width: 100%;
                   padding: 8px 40px 8px 12px;
-                  border: 1px solid #d1d5da;
+                  border: 1px solid var(--border-primary);
                   border-radius: 6px;
                   font-size: 14px;
                   box-sizing: border-box;
-                  background-color: #fafbfc;
+                  background-color: var(--bg-secondary);
                 "
               />
               <button
@@ -93,7 +93,7 @@ export function renderAdminLogin() {
                   transform: translateY(-50%);
                   background: none;
                   border: none;
-                  color: #586069;
+                  color: var(--text-secondary);
                   cursor: pointer;
                   padding: 4px 8px;
                   font-size: 12px;
@@ -127,14 +127,14 @@ export function renderAdminLogin() {
         <div style="text-align: center;">
           <a
             href="#/"
-            style="color: #0366d6; text-decoration: none; font-size: 14px;"
+            style="color: var(--color-tertiary); text-decoration: none; font-size: 14px;"
           >
             ← Back to Home
           </a>
-          <span style="color: #d1d5da; margin: 0 8px;">|</span>
+          <span style="color: var(--border-primary); margin: 0 8px;">|</span>
           <a
             href="#/login"
-            style="color: #0366d6; text-decoration: none; font-size: 14px;"
+            style="color: var(--color-tertiary); text-decoration: none; font-size: 14px;"
           >
             Team Login →
           </a>

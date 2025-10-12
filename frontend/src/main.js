@@ -90,7 +90,7 @@ router.beforeEach(async (to, from, next) => {
 function renderHome() {
   const app = document.querySelector('#app')
   app.innerHTML = `
-    <div class="min-h-screen" style="background-color: #fafbfc;">
+    <div class="min-h-screen">
       <!-- GitHub-style header -->
       <header class="header">
         <div class="container">
@@ -103,7 +103,7 @@ function renderHome() {
               <button class="btn btn-secondary" onclick="window.location.hash='#/login'">
                 Team Sign In
               </button>
-              <button class="btn" style="background-color: #444d56; color: white;" onclick="window.location.hash='#/admin'">
+              <button class="btn btn-secondary" onclick="window.location.hash='#/admin'">
                 Admin
               </button>
             </div>
@@ -114,22 +114,22 @@ function renderHome() {
       <!-- Main content -->
       <main class="container" style="padding-top: 32px;">
         <div class="card max-w-2xl mx-auto text-center">
-          <h2 class="text-2xl font-semibold mb-4" style="color: #24292e;">
+          <h2 class="text-2xl font-semibold mb-4" style="color: var(--text-primary);">
             Climbing Competition Scorekeeper
           </h2>
-          <p class="mb-4" style="color: #586069;">
+          <p class="mb-4" style="color: var(--text-secondary);">
             Powered by Climbers Association of Western Australia
           </p>
 
-          <div class="mt-6 p-4" style="background-color: #f6f8fa; border-radius: 6px;">
-            <p class="text-sm font-semibold mb-2" style="color: #24292e;">
+          <div class="mt-6 p-4" style="background-color: var(--bg-secondary); border-radius: 6px;">
+            <p class="text-sm font-semibold mb-2" style="color: var(--text-primary);">
               ✅ Phase 2 Complete
             </p>
-            <p class="text-sm mb-4" style="color: #586069;">
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">
               Router, Auth, Scoring Engine, and UI Helpers ready
             </p>
 
-            <ul class="text-sm text-left" style="color: #586069; list-style: none; padding: 0;">
+            <ul class="text-sm text-left" style="color: var(--text-secondary); list-style: none; padding: 0;">
               <li>✅ Supabase client initialized</li>
               <li>✅ Hash-based routing for GitHub Pages</li>
               <li>✅ Authentication manager with session handling</li>
