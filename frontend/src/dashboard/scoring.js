@@ -377,7 +377,7 @@ function renderRouteCard(route) {
               <div style="
                 font-size: 11px;
                 padding: 2px 6px;
-                background-color: #28a745;
+                background-color: #6c757d;
                 color: white;
                 border-radius: 10px;
               ">
@@ -451,9 +451,13 @@ function filterRoutes(allRoutes) {
  */
 function setupScoringListeners() {
   // Back to dashboard
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/dashboard')
-  })
+  const backBtn = document.getElementById('back-to-dashboard')
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault()
+      router.navigate('/dashboard')
+    })
+  }
 
   // Climber selection
   document.querySelectorAll('.climber-select-btn').forEach(btn => {
@@ -636,7 +640,7 @@ async function showAttemptModal(route) {
         </div>
       </div>
 
-      <div style="background-color: #fff5f7; padding: 12px; border-radius: 6px; margin-bottom: 24px;">
+      <div style="background-color: #fff5f7; padding: 12px; border-radius: 6px; margin-bottom: ${existingAttempts?.length > 0 ? '16px' : '24px'};">
         <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">
           ${selectedClimber.data.name}
         </div>
@@ -644,6 +648,48 @@ async function showAttemptModal(route) {
           Tick #${tickNumber} • <span style="color: var(--color-primary); font-weight: 600;">+${tickPoints} points</span>
         </div>
       </div>
+
+      ${existingAttempts?.length > 0 ? `
+        <div style="margin-bottom: 24px;">
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+            Previous Sends
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            ${existingAttempts.map((attempt, index) => `
+              <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 12px;
+                background-color: var(--bg-secondary);
+                border-radius: 4px;
+                font-size: 13px;
+              ">
+                <div>
+                  <span style="font-weight: 600;">Tick #${index + 1}</span>
+                  <span style="color: var(--text-secondary);"> • ${attempt.points_earned}pts</span>
+                  <span style="color: var(--text-secondary); font-size: 11px;"> • ${new Date(attempt.logged_at).toLocaleString()}</span>
+                </div>
+                <button
+                  type="button"
+                  class="delete-send-btn"
+                  data-ascent-id="${attempt.id}"
+                  style="
+                    background: none;
+                    border: none;
+                    color: #dc3545;
+                    cursor: pointer;
+                    font-size: 18px;
+                    padding: 4px 8px;
+                    line-height: 1;
+                  "
+                  title="Delete this send"
+                >🗑️</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       <form id="attempt-form">
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -672,6 +718,41 @@ async function showAttemptModal(route) {
   // Click outside to close
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal()
+  })
+
+  // Delete send handlers
+  document.querySelectorAll('.delete-send-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation()
+      const ascentId = btn.getAttribute('data-ascent-id')
+
+      if (!confirm('Are you sure you want to delete this send?')) {
+        return
+      }
+
+      try {
+        showLoading('Deleting send...')
+
+        const { error: deleteError } = await supabase
+          .from('ascents')
+          .delete()
+          .eq('id', ascentId)
+
+        if (deleteError) throw deleteError
+
+        hideLoading()
+        showSuccess('Send deleted')
+        closeModal()
+
+        // Refresh team data and update route list
+        await fetchFreshTeamData()
+        updateRoutesList()
+      } catch (error) {
+        hideLoading()
+        console.error('Error deleting send:', error)
+        showError('Failed to delete send: ' + error.message)
+      }
+    })
   })
 
   // Form submission handler

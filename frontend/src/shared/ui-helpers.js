@@ -24,13 +24,13 @@ class ToastManager {
     this.container.id = 'toast-container'
     this.container.style.cssText = `
       position: fixed;
-      top: 16px;
+      bottom: 16px;
       right: 16px;
       z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-width: 400px;
+      gap: 6px;
+      max-width: 280px;
     `
     document.body.appendChild(this.container)
   }
@@ -59,13 +59,14 @@ class ToastManager {
     toast.style.cssText = `
       background-color: ${color.bg};
       border: 1px solid ${color.border};
-      border-radius: 6px;
-      padding: 12px 16px;
+      border-radius: 4px;
+      padding: 8px 12px;
       color: ${color.text};
-      font-size: 14px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      animation: slideIn 0.3s ease;
+      font-size: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      animation: slideInBottom 0.3s ease;
       cursor: pointer;
+      opacity: 0.95;
     `
 
     toast.textContent = message
@@ -85,7 +86,7 @@ class ToastManager {
    * Remove a toast
    */
   remove(toast) {
-    toast.style.animation = 'slideOut 0.3s ease'
+    toast.style.animation = 'slideOutBottom 0.3s ease'
     setTimeout(() => {
       if (toast.parentNode) {
         toast.parentNode.removeChild(toast)
@@ -331,24 +332,24 @@ function addStyles() {
   const style = document.createElement('style')
   style.id = 'ui-helpers-styles'
   style.textContent = `
-    @keyframes slideIn {
+    @keyframes slideInBottom {
       from {
-        transform: translateX(100%);
+        transform: translateY(20px);
         opacity: 0;
       }
       to {
-        transform: translateX(0);
+        transform: translateY(0);
         opacity: 1;
       }
     }
 
-    @keyframes slideOut {
+    @keyframes slideOutBottom {
       from {
-        transform: translateX(0);
+        transform: translateY(0);
         opacity: 1;
       }
       to {
-        transform: translateX(100%);
+        transform: translateY(20px);
         opacity: 0;
       }
     }
