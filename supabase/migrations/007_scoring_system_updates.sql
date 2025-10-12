@@ -22,28 +22,28 @@ CREATE INDEX IF NOT EXISTS idx_routes_ordering
 ON routes(sector_order, route_order);
 
 -- ============================================================================
--- 2. ATTEMPTS TABLE UPDATES
+-- 2. ASCENTS TABLE UPDATES
 -- ============================================================================
 
--- Add tick tracking and scoring fields to attempts table
-ALTER TABLE attempts
+-- Add tick tracking and scoring fields to ascents table
+ALTER TABLE ascents
 ADD COLUMN IF NOT EXISTS tick_number INTEGER DEFAULT 1,
 ADD COLUMN IF NOT EXISTS tick_multiplier DECIMAL(3,2) DEFAULT 1.00,
 ADD COLUMN IF NOT EXISTS trad_bonus_applied BOOLEAN DEFAULT false;
 
 -- Add constraints
-ALTER TABLE attempts
+ALTER TABLE ascents
 ADD CONSTRAINT tick_number_positive CHECK (tick_number >= 1 AND tick_number <= 10),
 ADD CONSTRAINT tick_multiplier_valid CHECK (tick_multiplier >= 0 AND tick_multiplier <= 1.00);
 
 -- Add comments
-COMMENT ON COLUMN attempts.tick_number IS 'Which tick this is for this climber on this route (1-10)';
-COMMENT ON COLUMN attempts.tick_multiplier IS 'Scoring multiplier: 1st=1.00, 2nd=0.75, 3rd=0.50, 4th=0.25, 5th+=0.00';
-COMMENT ON COLUMN attempts.trad_bonus_applied IS 'Whether 50% trad bonus was applied to this attempt';
+COMMENT ON COLUMN ascents.tick_number IS 'Which tick this is for this climber on this route (1-10)';
+COMMENT ON COLUMN ascents.tick_multiplier IS 'Scoring multiplier: 1st=1.00, 2nd=0.75, 3rd=0.50, 4th=0.25, 5th+=0.00';
+COMMENT ON COLUMN ascents.trad_bonus_applied IS 'Whether 50% trad bonus was applied to this attempt';
 
 -- Create index for efficient tick counting
-CREATE INDEX IF NOT EXISTS idx_attempts_tick_tracking
-ON attempts(climber_id, route_id, tick_number);
+CREATE INDEX IF NOT EXISTS idx_ascents_tick_tracking
+ON ascents(climber_id, route_id, tick_number);
 
 -- ============================================================================
 -- 3. COMPETITION SETTINGS TABLE
@@ -208,7 +208,7 @@ DECLARE
 BEGIN
   -- Get highest tick number for this climber on this route
   SELECT COALESCE(MAX(tick_number), 0) INTO v_max_tick
-  FROM attempts
+  FROM ascents
   WHERE climber_id = p_climber_id
     AND route_id = p_route_id
     AND success = true;
@@ -224,8 +224,8 @@ COMMENT ON FUNCTION get_next_tick_number(UUID, UUID) IS 'Get next tick number fo
 -- 6. UPDATE EXISTING DATA (if any)
 -- ============================================================================
 
--- Set default tick_number=1 and tick_multiplier=1.00 for existing attempts
-UPDATE attempts
+-- Set default tick_number=1 and tick_multiplier=1.00 for existing ascents
+UPDATE ascents
 SET
   tick_number = 1,
   tick_multiplier = 1.00,
@@ -262,7 +262,7 @@ DO $$
 BEGIN
   RAISE NOTICE '✅ Migration 007 complete: Scoring system updates applied';
   RAISE NOTICE '   - Routes table: sector, sector_order, route_order added';
-  RAISE NOTICE '   - Attempts table: tick_number, tick_multiplier, trad_bonus_applied added';
+  RAISE NOTICE '   - Ascents table: tick_number, tick_multiplier, trad_bonus_applied added';
   RAISE NOTICE '   - Competition settings table created with default values';
   RAISE NOTICE '   - Helper functions created for scoring logic';
   RAISE NOTICE '   - RLS policies applied';
