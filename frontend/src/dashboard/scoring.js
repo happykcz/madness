@@ -7,6 +7,7 @@
 import { supabase } from '../lib/supabase.js'
 import { showSuccess, showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
 import { calculateTickPoints, getTickMultiplier } from '../shared/scoring-engine.js'
+import { router } from '../lib/router.js'
 
 let currentFilters = {
   type: 'all', // 'all', 'sport', 'trad', 'boulder'
@@ -393,7 +394,7 @@ function filterRoutes(allRoutes) {
 function setupScoringListeners() {
   // Back to dashboard
   document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    window.location.hash = '#/dashboard'
+    router.navigate('/dashboard')
   })
 
   // Climber selection
