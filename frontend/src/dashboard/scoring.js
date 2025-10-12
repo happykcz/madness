@@ -293,11 +293,10 @@ function renderRouteCard(route) {
   const isZeroPoint = route.base_points === 0
   const typeColor = route.gear_type === 'trad' ? '#ff0046' : route.gear_type === 'boulder' ? '#6f42c1' : '#0366d6'
 
-  // Get attempts for this route by current climber
-  const routeAttempts = climberAttempts.filter(a => a.route_id === route.id)
-  const successfulTicks = routeAttempts.filter(a => a.success).length
-  const totalAttempts = routeAttempts.length
-  const totalPoints = routeAttempts.reduce((sum, a) => sum + (a.points_earned || 0), 0)
+  // Get sends for this route by current climber (all ascents are successful)
+  const routeSends = climberAttempts.filter(a => a.route_id === route.id)
+  const totalSends = routeSends.length
+  const totalPoints = routeSends.reduce((sum, a) => sum + (a.points_earned || 0), 0)
 
   return `
     <div
@@ -320,15 +319,15 @@ function renderRouteCard(route) {
             <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
               ${route.name}
             </div>
-            ${totalAttempts > 0 ? `
+            ${totalSends > 0 ? `
               <div style="
                 font-size: 11px;
                 padding: 2px 6px;
-                background-color: ${successfulTicks > 0 ? '#28a745' : '#6c757d'};
+                background-color: #28a745;
                 color: white;
                 border-radius: 10px;
               ">
-                ${successfulTicks}/${totalAttempts} • ${totalPoints}pts
+                ${totalSends} ${totalSends === 1 ? 'send' : 'sends'} • ${totalPoints}pts
               </div>
             ` : ''}
           </div>
@@ -552,7 +551,7 @@ async function showAttemptModal(route) {
     <div class="card" style="max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 0;">
-          Log Attempt
+          Log Send
         </h2>
         <button id="close-modal" style="
           background: none;
@@ -578,64 +577,22 @@ async function showAttemptModal(route) {
         </div>
       </div>
 
-      <div style="background-color: #fff5f7; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+      <div style="background-color: #fff5f7; padding: 12px; border-radius: 6px; margin-bottom: 24px;">
         <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">
           ${selectedClimber.data.name}
         </div>
         <div style="font-size: 13px; color: var(--text-secondary);">
-          Tick #${tickNumber} • ${tickPoints} points
+          Tick #${tickNumber} • <span style="color: var(--color-primary); font-weight: 600;">+${tickPoints} points</span>
         </div>
       </div>
 
       <form id="attempt-form">
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">
-            Attempt Result *
-          </label>
-          <div style="display: flex; gap: 12px;">
-            <label style="
-              flex: 1;
-              padding: 12px;
-              border: 2px solid var(--border-primary);
-              border-radius: 6px;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              transition: all 0.2s;
-            " class="result-option">
-              <input type="radio" name="result" value="success" required style="margin: 0;" />
-              <div>
-                <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">✅ Success</div>
-                <div style="font-size: 12px; color: var(--text-secondary);">Completed the route</div>
-              </div>
-            </label>
-            <label style="
-              flex: 1;
-              padding: 12px;
-              border: 2px solid var(--border-primary);
-              border-radius: 6px;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              transition: all 0.2s;
-            " class="result-option">
-              <input type="radio" name="result" value="failure" required style="margin: 0;" />
-              <div>
-                <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">❌ Failure</div>
-                <div style="font-size: 12px; color: var(--text-secondary);">Did not complete</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
           <button type="button" id="cancel-btn" class="btn btn-secondary">
             Cancel
           </button>
           <button type="submit" class="btn btn-primary">
-            Save Attempt
+            ✅ Log Send
           </button>
         </div>
       </form>
@@ -658,52 +615,31 @@ async function showAttemptModal(route) {
     if (e.target === modal) closeModal()
   })
 
-  // Style radio button selections
-  document.querySelectorAll('.result-option').forEach(label => {
-    const radio = label.querySelector('input[type="radio"]')
-    radio?.addEventListener('change', () => {
-      document.querySelectorAll('.result-option').forEach(opt => {
-        opt.style.borderColor = 'var(--border-primary)'
-        opt.style.backgroundColor = 'var(--bg-white)'
-      })
-      if (radio.checked) {
-        label.style.borderColor = 'var(--color-primary)'
-        label.style.backgroundColor = '#fff5f7'
-      }
-    })
-  })
-
   // Form submission handler
   document.getElementById('attempt-form')?.addEventListener('submit', async (e) => {
     e.preventDefault()
 
-    const formData = new FormData(e.target)
-    const result = formData.get('result')
-
-    if (!result) {
-      showError('Please select an attempt result')
-      return
-    }
-
     try {
-      showLoading('Saving attempt...')
+      showLoading('Logging send...')
 
-      // Insert ascent record
+      // Insert ascent record (team_id is auto-set by trigger)
       const { error: insertError } = await supabase
         .from('ascents')
         .insert({
           climber_id: selectedClimber.id,
           route_id: route.id,
-          success: result === 'success',
           tick_number: tickNumber,
-          points_earned: result === 'success' ? tickPoints : 0,
+          tick_multiplier: getTickMultiplier(tickNumber),
+          trad_bonus_applied: isTrad,
+          points_earned: tickPoints,
+          repeat_count: tickNumber,
           logged_at: new Date().toISOString()
         })
 
       if (insertError) throw insertError
 
       hideLoading()
-      showSuccess(`Attempt logged! ${result === 'success' ? `+${tickPoints} points` : 'No points'}`)
+      showSuccess(`Send logged! +${tickPoints} points`)
       closeModal()
 
       // Refresh team data and update route list
@@ -711,8 +647,8 @@ async function showAttemptModal(route) {
       updateRoutesList()
     } catch (error) {
       hideLoading()
-      console.error('Error saving attempt:', error)
-      showError('Failed to save attempt: ' + error.message)
+      console.error('Error saving send:', error)
+      showError('Failed to log send: ' + error.message)
     }
   })
 }
