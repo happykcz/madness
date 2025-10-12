@@ -26,8 +26,16 @@ let climberAttempts = [] // All attempts for selected climber
 export async function renderScoring(team, climbers, climberScores) {
   teamData = { team, climbers, climberScores }
 
+  // Reset state on page load
+  selectedClimber = null
+  climberAttempts = []
+
   // Fetch routes
   await fetchRoutes()
+
+  // Calculate team total
+  const teamTotalPoints = climberScores.reduce((sum, score) => sum + (score?.total_points || 0), 0)
+  const teamTotalAscents = climberScores.reduce((sum, score) => sum + (score?.route_ascents || 0), 0)
 
   const app = document.querySelector('#app')
 
@@ -36,18 +44,18 @@ export async function renderScoring(team, climbers, climberScores) {
       <!-- Header -->
       <header class="header" style="padding: 12px 16px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
             <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 32px;" />
-            <div>
+            <div style="flex: 1;">
               <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
                 ${team.team_name}
               </h1>
               <div style="color: rgba(255,255,255,0.8); font-size: 12px;">
-                Scoring
+                Team Total: <span style="color: var(--color-primary); font-weight: 600;">${teamTotalPoints} pts</span> • ${teamTotalAscents} sends
               </div>
             </div>
           </div>
-          <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
+          <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px; white-space: nowrap;">
             ← Dashboard
           </button>
         </div>
@@ -288,6 +296,51 @@ function renderRoutesList() {
 }
 
 /**
+ * Generate 4-wedge progress indicator SVG
+ */
+function generateProgressIndicator(sendCount) {
+  const maxSends = 4
+  const filled = Math.min(sendCount, maxSends)
+  const fillColor = '#28a745'
+  const emptyColor = '#e1e4e8'
+
+  // Create 4 wedges (90 degrees each)
+  const wedges = []
+  for (let i = 0; i < maxSends; i++) {
+    const startAngle = (i * 90) - 90 // Start from top
+    const endAngle = startAngle + 90
+    const isFilled = i < filled
+    const color = isFilled ? fillColor : emptyColor
+
+    // Calculate arc path
+    const startRad = (startAngle * Math.PI) / 180
+    const endRad = (endAngle * Math.PI) / 180
+    const x1 = 50 + 45 * Math.cos(startRad)
+    const y1 = 50 + 45 * Math.sin(startRad)
+    const x2 = 50 + 45 * Math.cos(endRad)
+    const y2 = 50 + 45 * Math.sin(endRad)
+
+    wedges.push(`
+      <path d="M 50 50 L ${x1} ${y1} A 45 45 0 0 1 ${x2} ${y2} Z"
+            fill="${color}"
+            stroke="white"
+            stroke-width="2"/>
+    `)
+  }
+
+  return `
+    <svg width="40" height="40" viewBox="0 0 100 100" style="transform: rotate(0deg);">
+      ${wedges.join('')}
+      <circle cx="50" cy="50" r="20" fill="white"/>
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+            font-size="24" font-weight="600" fill="#333">
+        ${sendCount}
+      </text>
+    </svg>
+  `
+}
+
+/**
  * Render individual route card
  */
 function renderRouteCard(route) {
@@ -314,7 +367,7 @@ function renderRouteCard(route) {
         transition: all 0.2s;
       "
     >
-      <div style="display: flex; justify-content: space-between; align-items: start;">
+      <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
         <div style="flex: 1;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
             <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
@@ -356,6 +409,11 @@ function renderRouteCard(route) {
             `}
           </div>
         </div>
+        ${!isZeroPoint ? `
+          <div style="flex-shrink: 0; display: flex; align-items: center;">
+            ${generateProgressIndicator(totalSends)}
+          </div>
+        ` : ''}
       </div>
     </div>
   `
