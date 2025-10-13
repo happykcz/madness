@@ -1,228 +1,210 @@
 /**
  * Admin Competition Control Interface
- * Allows admins to:
- * - View current competition status
- * - Manually open/close competition
- * - Set scoring window times
+ * Clean design matching scoring page style
  */
 
 import { supabase } from '../lib/supabase.js'
 import { router } from '../lib/router.js'
+import { showSuccess, showError, showWarning } from '../shared/ui-helpers.js'
 
 export async function renderCompetitionControl() {
   const app = document.getElementById('app')
-  
+
   app.innerHTML = `
-    <div style="min-height: 100vh; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); padding: 24px;">
-      <div style="max-width: 1000px; margin: 0 auto;">
-        
-        <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-          <div>
-            <h1 style="margin: 0 0 8px 0; color: var(--text-primary); font-size: 28px; font-weight: 700;">
-              Competition Control
-            </h1>
-            <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
-              Manage competition status and scoring windows
-            </p>
-          </div>
-          
-          <button id="back-to-dashboard" style="
-            padding: 10px 20px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-primary);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          ">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div style="min-height: 100vh; background-color: var(--bg-primary);">
+      <!-- Header -->
+      <header class="header" style="padding: 12px 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h1 style="color: white; font-size: 18px; font-weight: 600; margin: 0;">
+            Competition Control
+          </h1>
+          <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
               <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
-            Back to Dashboard
+            Back
           </button>
         </div>
+      </header>
+
+      <main class="container" style="padding: 16px 16px 32px;">
 
         <!-- Current Status Card -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; color: var(--text-primary); font-size: 20px; font-weight: 600;">
+        <div class="card" style="margin-bottom: 16px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0;">
               Current Status
             </h2>
-            <button id="refresh-status" style="
-              padding: 8px 16px;
-              background: var(--bg-primary);
-              color: var(--text-primary);
-              border: 1px solid var(--border-primary);
-              border-radius: 6px;
-              font-size: 14px;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              gap: 6px;
-            ">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="refresh-btn" class="btn btn-secondary" style="font-size: 12px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
               </svg>
               Refresh
             </button>
           </div>
-          
-          <div id="status-display" style="display: flex; flex-direction: column; gap: 16px;">
-            <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-              Loading status...
+
+          <!-- Status Display -->
+          <div id="status-display">
+            <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 13px;">
+              Loading...
             </div>
           </div>
         </div>
 
         <!-- Manual Control Card -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <h2 style="margin: 0 0 20px 0; color: var(--text-primary); font-size: 20px; font-weight: 600;">
+        <div class="card" style="margin-bottom: 16px; padding: 16px;">
+          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
             Manual Control
           </h2>
-          
-          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button id="btn-open-competition" style="
-              flex: 1;
-              min-width: 200px;
-              padding: 14px 20px;
-              background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <button id="btn-open" class="btn" style="
+              background-color: #28a745;
               color: white;
               border: none;
-              border-radius: 8px;
-              font-size: 15px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-              box-shadow: 0 2px 8px rgba(40,167,69,0.3);
+              padding: 10px;
+              font-size: 13px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
             ">
-              🟢 Open Competition
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+              Open
             </button>
-            
-            <button id="btn-close-competition" style="
-              flex: 1;
-              min-width: 200px;
-              padding: 14px 20px;
-              background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+
+            <button id="btn-close" class="btn" style="
+              background-color: #dc3545;
               color: white;
               border: none;
-              border-radius: 8px;
-              font-size: 15px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-              box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+              padding: 10px;
+              font-size: 13px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
             ">
-              🔴 Close Competition
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M15 9l-6 6M9 9l6 6"/>
+              </svg>
+              Close
             </button>
           </div>
-          
-          <div style="margin-top: 16px; padding: 12px; background: var(--bg-primary); border-radius: 6px; border-left: 3px solid #ffc107;">
-            <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">
-              <strong>Note:</strong> Manual open/close overrides automatic window timing. Teams will be able to log sends regardless of scheduled times when manually opened.
-            </p>
+
+          <div style="
+            padding: 8px 10px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #856404;
+            line-height: 1.4;
+          ">
+            <strong>Note:</strong> Manual control overrides automatic window timing
           </div>
         </div>
 
-        <!-- Scoring Window Settings Card -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <h2 style="margin: 0 0 20px 0; color: var(--text-primary); font-size: 20px; font-weight: 600;">
+        <!-- Scoring Window Times Card -->
+        <div class="card" style="padding: 16px;">
+          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
             Scoring Window Times
           </h2>
-          
-          <form id="window-settings-form">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-              
+
+          <form id="window-form">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px;">
+
               <!-- Start Time -->
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
                   Competition Start (AWST)
                 </label>
                 <input
                   type="datetime-local"
-                  id="competition-start"
+                  id="comp-start"
                   required
-                  style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-primary); border-radius: 6px; font-size: 14px; box-sizing: border-box; background: var(--bg-primary);"
+                  class="form-input"
+                  style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
                 />
-                <p style="margin: 6px 0 0 0; font-size: 12px; color: var(--text-secondary);">
-                  When the scoring window opens
-                </p>
               </div>
-              
+
               <!-- End Time -->
               <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); font-size: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
                   Competition End (AWST)
                 </label>
                 <input
                   type="datetime-local"
-                  id="competition-end"
+                  id="comp-end"
                   required
-                  style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-primary); border-radius: 6px; font-size: 14px; box-sizing: border-box; background: var(--bg-primary);"
+                  class="form-input"
+                  style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
                 />
-                <p style="margin: 6px 0 0 0; font-size: 12px; color: var(--text-secondary);">
-                  When the scoring window closes
-                </p>
               </div>
-              
+
             </div>
-            
-            <button type="submit" style="
+
+            <button type="submit" class="btn btn-primary" style="
               width: 100%;
-              padding: 14px 20px;
-              background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-size: 15px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-              box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+              padding: 10px;
+              font-size: 13px;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
             ">
-              💾 Save Window Times
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Save Window Times
             </button>
           </form>
         </div>
 
-      </div>
+      </main>
     </div>
+
+    <style>
+      @media (min-width: 640px) {
+        #window-form > div {
+          grid-template-columns: 1fr 1fr !important;
+        }
+      }
+    </style>
   `
 
-  // Setup event listeners
-  setupCompetitionListeners()
-  
-  // Load initial status
-  await loadCompetitionStatus()
+  setupListeners()
+  await loadStatus()
 }
 
-async function loadCompetitionStatus() {
+async function loadStatus() {
   const statusDisplay = document.getElementById('status-display')
-  
+
   try {
-    // Fetch competition settings
     const { data: settings, error } = await supabase
       .from('competition_settings')
       .select('*')
       .single()
-    
+
     if (error) throw error
-    
-    // Calculate current status
+
     const now = new Date()
     const start = new Date(settings.competition_start)
     const end = new Date(settings.competition_end)
-    
+
     const isInWindow = now >= start && now <= end
     const isActive = settings.is_open || isInWindow
-    
-    // Format times for display
-    const formatDateTime = (date) => {
+
+    // Format times
+    const formatTime = (date) => {
       return new Date(date).toLocaleString('en-AU', {
         timeZone: 'Australia/Perth',
         year: 'numeric',
@@ -233,83 +215,97 @@ async function loadCompetitionStatus() {
         hour12: true
       })
     }
-    
-    // Populate form fields (convert to local datetime-local format)
-    const toLocalDateTimeString = (date) => {
+
+    // Populate form
+    const toLocalString = (date) => {
       const d = new Date(date)
       const offset = d.getTimezoneOffset() * 60000
-      const localDate = new Date(d.getTime() - offset)
-      return localDate.toISOString().slice(0, 16)
+      return new Date(d.getTime() - offset).toISOString().slice(0, 16)
     }
-    
-    document.getElementById('competition-start').value = toLocalDateTimeString(settings.competition_start)
-    document.getElementById('competition-end').value = toLocalDateTimeString(settings.competition_end)
-    
-    // Render status display
+
+    document.getElementById('comp-start').value = toLocalString(settings.competition_start)
+    document.getElementById('comp-end').value = toLocalString(settings.competition_end)
+
+    // Render status
+    const statusColor = isActive ? '#28a745' : '#dc3545'
+    const statusText = isActive ? 'OPEN' : 'CLOSED'
+    const statusIcon = isActive
+      ? '<circle cx="12" cy="12" r="10" fill="#28a745"/>'
+      : '<circle cx="12" cy="12" r="10" fill="#dc3545"/><path d="M15 9l-6 6M9 9l6 6" stroke="white" stroke-width="2"/>'
+
+    const statusReason = settings.is_open
+      ? 'Manually opened by admin'
+      : isInWindow ? 'Within scheduled window' : 'Outside scheduled window'
+
     statusDisplay.innerHTML = `
-      <!-- Overall Status -->
-      <div style="display: flex; align-items: center; gap: 16px; padding: 16px; background: ${isActive ? 'linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(32,201,151,0.1) 100%)' : 'linear-gradient(135deg, rgba(220,53,69,0.1) 0%, rgba(200,35,51,0.1) 100%)'}; border-radius: 8px; border: 2px solid ${isActive ? '#28a745' : '#dc3545'};">
-        <div style="font-size: 48px;">
-          ${isActive ? '🟢' : '🔴'}
-        </div>
+      <!-- Main Status -->
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background-color: ${isActive ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)'};
+        border: 2px solid ${statusColor};
+        border-radius: 6px;
+        margin-bottom: 12px;
+      ">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          ${statusIcon}
+        </svg>
         <div style="flex: 1;">
-          <div style="font-size: 24px; font-weight: 700; color: ${isActive ? '#28a745' : '#dc3545'}; margin-bottom: 4px;">
-            ${isActive ? 'OPEN' : 'CLOSED'}
+          <div style="font-size: 18px; font-weight: 700; color: ${statusColor};">
+            ${statusText}
           </div>
-          <div style="font-size: 14px; color: var(--text-secondary);">
-            ${settings.is_open ? 'Manually opened by admin' : isInWindow ? 'Within scheduled window' : 'Outside scheduled window'}
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            ${statusReason}
           </div>
         </div>
       </div>
-      
+
       <!-- Details Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-        
-        <!-- Manual Override -->
-        <div style="padding: 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-primary);">
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 600;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+        <div style="padding: 10px; background-color: var(--bg-secondary); border-radius: 4px;">
+          <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">
             Manual Override
           </div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--text-primary);">
-            ${settings.is_open ? '✅ Active' : '❌ Inactive'}
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">
+            ${settings.is_open ? 'Active' : 'Inactive'}
           </div>
         </div>
-        
-        <!-- Scheduled Window -->
-        <div style="padding: 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-primary);">
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 600;">
+
+        <div style="padding: 10px; background-color: var(--bg-secondary); border-radius: 4px;">
+          <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">
             Scheduled Window
           </div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--text-primary);">
-            ${isInWindow ? '✅ Active' : '❌ Inactive'}
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">
+            ${isInWindow ? 'Active' : 'Inactive'}
           </div>
         </div>
-        
       </div>
-      
+
       <!-- Window Times -->
-      <div style="padding: 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-primary);">
-        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; font-weight: 600;">
-          Scheduled Window Times
+      <div style="padding: 10px; background-color: var(--bg-secondary); border-radius: 4px;">
+        <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;">
+          Scheduled Times
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: var(--text-secondary); font-size: 14px;">Start:</span>
-            <span style="color: var(--text-primary); font-weight: 500; font-size: 14px;">${formatDateTime(settings.competition_start)}</span>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Start:</span>
+            <span style="color: var(--text-primary); font-weight: 500;">${formatTime(settings.competition_start)}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: var(--text-secondary); font-size: 14px;">End:</span>
-            <span style="color: var(--text-primary); font-weight: 500; font-size: 14px;">${formatDateTime(settings.competition_end)}</span>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">End:</span>
+            <span style="color: var(--text-primary); font-weight: 500;">${formatTime(settings.competition_end)}</span>
           </div>
         </div>
       </div>
     `
-    
+
   } catch (error) {
-    console.error('Error loading competition status:', error)
+    console.error('Error loading status:', error)
     statusDisplay.innerHTML = `
-      <div style="padding: 16px; background: rgba(220,53,69,0.1); border-radius: 8px; border: 1px solid #dc3545; color: #dc3545;">
-        ❌ Error loading status: ${error.message}
+      <div style="padding: 12px; background-color: rgba(220,53,69,0.1); border: 1px solid #dc3545; border-radius: 4px; color: #dc3545; font-size: 12px;">
+        Error loading status: ${error.message}
       </div>
     `
   }
@@ -317,7 +313,6 @@ async function loadCompetitionStatus() {
 
 async function openCompetition() {
   try {
-    // Get settings ID first
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
       .select('id')
@@ -325,7 +320,6 @@ async function openCompetition() {
 
     if (fetchError) throw fetchError
 
-    // Update the settings
     const { error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: true, updated_at: new Date().toISOString() })
@@ -333,18 +327,17 @@ async function openCompetition() {
 
     if (updateError) throw updateError
 
-    showNotification('✅ Competition opened successfully', 'success')
-    await loadCompetitionStatus()
+    showSuccess('Competition opened successfully')
+    await loadStatus()
 
   } catch (error) {
     console.error('Error opening competition:', error)
-    showNotification('❌ Error opening competition: ' + error.message, 'error')
+    showError('Failed to open competition: ' + error.message)
   }
 }
 
 async function closeCompetition() {
   try {
-    // Get settings ID first
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
       .select('id')
@@ -352,7 +345,6 @@ async function closeCompetition() {
 
     if (fetchError) throw fetchError
 
-    // Update the settings
     const { error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: false, updated_at: new Date().toISOString() })
@@ -360,36 +352,35 @@ async function closeCompetition() {
 
     if (updateError) throw updateError
 
-    showNotification('✅ Competition closed successfully', 'success')
-    await loadCompetitionStatus()
+    showSuccess('Competition closed successfully')
+    await loadStatus()
 
   } catch (error) {
     console.error('Error closing competition:', error)
-    showNotification('❌ Error closing competition: ' + error.message, 'error')
+    showError('Failed to close competition: ' + error.message)
   }
 }
 
 async function updateWindowTimes(e) {
   e.preventDefault()
-  
-  const startInput = document.getElementById('competition-start').value
-  const endInput = document.getElementById('competition-end').value
-  
+
+  const startInput = document.getElementById('comp-start').value
+  const endInput = document.getElementById('comp-end').value
+
   if (!startInput || !endInput) {
-    showNotification('⚠️ Please fill in both start and end times', 'warning')
+    showWarning('Please fill in both start and end times')
     return
   }
-  
+
   const start = new Date(startInput)
   const end = new Date(endInput)
-  
+
   if (end <= start) {
-    showNotification('⚠️ End time must be after start time', 'warning')
+    showWarning('End time must be after start time')
     return
   }
-  
+
   try {
-    // Get settings ID first
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
       .select('id')
@@ -397,7 +388,6 @@ async function updateWindowTimes(e) {
 
     if (fetchError) throw fetchError
 
-    // Update the window times
     const { error: updateError } = await supabase
       .from('competition_settings')
       .update({
@@ -409,61 +399,22 @@ async function updateWindowTimes(e) {
 
     if (updateError) throw updateError
 
-    showNotification('✅ Window times updated successfully', 'success')
-    await loadCompetitionStatus()
+    showSuccess('Window times updated successfully')
+    await loadStatus()
 
   } catch (error) {
     console.error('Error updating window times:', error)
-    showNotification('❌ Error updating times: ' + error.message, 'error')
+    showError('Failed to update times: ' + error.message)
   }
 }
 
-function setupCompetitionListeners() {
-  // Back button
+function setupListeners() {
   document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
     router.navigate('/admin/dashboard')
   })
-  
-  // Refresh button
-  document.getElementById('refresh-status')?.addEventListener('click', loadCompetitionStatus)
-  
-  // Manual control buttons
-  document.getElementById('btn-open-competition')?.addEventListener('click', openCompetition)
-  document.getElementById('btn-close-competition')?.addEventListener('click', closeCompetition)
-  
-  // Window settings form
-  document.getElementById('window-settings-form')?.addEventListener('submit', updateWindowTimes)
-}
 
-function showNotification(message, type = 'info') {
-  const colors = {
-    success: '#28a745',
-    error: '#dc3545',
-    warning: '#ffc107',
-    info: '#17a2b8'
-  }
-  
-  const notification = document.createElement('div')
-  notification.style.cssText = `
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: ${colors[type]};
-    color: white;
-    padding: 16px 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 10000;
-    animation: slideIn 0.3s ease-out;
-  `
-  notification.textContent = message
-  
-  document.body.appendChild(notification)
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease-out'
-    setTimeout(() => notification.remove(), 300)
-  }, 3000)
+  document.getElementById('refresh-btn')?.addEventListener('click', loadStatus)
+  document.getElementById('btn-open')?.addEventListener('click', openCompetition)
+  document.getElementById('btn-close')?.addEventListener('click', closeCompetition)
+  document.getElementById('window-form')?.addEventListener('submit', updateWindowTimes)
 }
