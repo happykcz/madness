@@ -48,10 +48,12 @@ Edit `routes_template.csv` with your ~60 routes:
 - **grade**: Climbing grade (e.g., 18, V3)
 - **grade_numeric**: Numeric value for sorting (e.g., 18)
 - **gear_type**: sport, trad, or boulder
-- **base_points**: Points for first ascent (0 for navigation routes)
+- **base_points**: Points for first ascent (supports decimals: 12.50, 0.00 for navigation routes)
 - **sector**: Sector name (e.g., Main Area, Trad Section)
 - **sector_order**: Order of sectors (0, 1, 2, ...)
 - **route_order**: Order within sector (1, 2, 3, ...)
+
+**Note:** `base_points` is now NUMERIC(5,2) - you can use any decimal value like 7.50, 12.75, or 0.00
 
 ### Step 2: Convert CSV to SQL
 
