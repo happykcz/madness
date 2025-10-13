@@ -44,12 +44,13 @@ BEGIN
     ELSE 1.0
   END;
 
-  -- Calculate repeat penalty multiplier
+  -- Calculate repeat penalty multiplier (4 scoring attempts)
   v_repeat_multiplier := CASE
-    WHEN v_repeat_count = 1 THEN 1.0   -- 100%
-    WHEN v_repeat_count = 2 THEN 0.75  -- 75%
-    WHEN v_repeat_count = 3 THEN 0.25  -- 25%
-    ELSE 0.0                            -- 0% for 4th+
+    WHEN v_repeat_count = 1 THEN 1.0   -- 100% for 1st attempt
+    WHEN v_repeat_count = 2 THEN 0.75  -- 75% for 2nd attempt
+    WHEN v_repeat_count = 3 THEN 0.50  -- 50% for 3rd attempt
+    WHEN v_repeat_count = 4 THEN 0.25  -- 25% for 4th attempt
+    ELSE 0.0                            -- 0% for 5th+ attempts
   END;
 
   -- Calculate final points (rounded down)
