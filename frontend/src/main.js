@@ -8,6 +8,7 @@ import { renderAdminLogin } from './admin/admin-login.js'
 import { renderAdminDashboard } from './admin/admin-dashboard.js'
 import { renderTeamManagement } from './admin/admin-teams.js'
 import { renderLeaderboards } from './admin/admin-leaderboards.js'
+import { renderCompetitionControl } from './admin/admin-competition.js'
 import { showInfo, showSuccess } from './shared/ui-helpers.js'
 
 // Application entry point
@@ -46,12 +47,13 @@ router.registerRoutes({
   '/admin/dashboard': renderAdminDashboard,
   '/admin/teams': renderTeamManagement,
   '/admin/leaderboards': renderLeaderboards,
+  '/admin/competition': renderCompetitionControl,
 })
 
 // Add auth guard for protected routes
 router.beforeEach(async (to, from, next) => {
   const teamProtectedRoutes = ['/dashboard']
-  const adminProtectedRoutes = ['/admin/dashboard', '/admin/teams', '/admin/leaderboards', '/admin/results', '/admin/settings']
+  const adminProtectedRoutes = ['/admin/dashboard', '/admin/teams', '/admin/leaderboards', '/admin/competition', '/admin/results', '/admin/settings']
 
   // Check team routes
   if (teamProtectedRoutes.includes(to) && !authManager.isAuthenticated()) {

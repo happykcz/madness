@@ -210,7 +210,7 @@ function setupNavigationListeners() {
   })
 
   document.getElementById('nav-settings')?.addEventListener('click', () => {
-    router.navigate('/admin/settings')
+    router.navigate('/admin/competition')
   })
 
   document.getElementById('admin-signout')?.addEventListener('click', async () => {
