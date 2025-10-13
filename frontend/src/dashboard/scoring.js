@@ -449,14 +449,23 @@ function filterRoutes(allRoutes) {
  * Setup event listeners
  */
 function setupScoringListeners() {
-  // Back to dashboard
-  const backBtn = document.getElementById('back-to-dashboard')
-  if (backBtn) {
-    backBtn.addEventListener('click', (e) => {
-      e.preventDefault()
-      router.navigate('/dashboard')
-    })
-  }
+  // Back to dashboard - wait for next tick to ensure DOM is ready
+  setTimeout(() => {
+    const backBtn = document.getElementById('back-to-dashboard')
+    if (backBtn) {
+      // Remove any existing listeners
+      backBtn.replaceWith(backBtn.cloneNode(true))
+      const freshBtn = document.getElementById('back-to-dashboard')
+      freshBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        console.log('Navigating to dashboard')
+        router.navigate('/dashboard')
+      })
+    } else {
+      console.error('Back to dashboard button not found')
+    }
+  }, 0)
 
   // Climber selection
   document.querySelectorAll('.climber-select-btn').forEach(btn => {
