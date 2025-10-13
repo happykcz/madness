@@ -1003,6 +1003,32 @@ function showEditTeamModal(team) {
           />
         </div>
 
+        <!-- Team Category -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+            Team Category
+          </label>
+          <select
+            id="edit-team-category"
+            required
+            style="
+              width: 100%;
+              padding: 8px 12px;
+              border: 1px solid var(--border-primary);
+              border-radius: 6px;
+              font-size: 14px;
+              box-sizing: border-box;
+              background-color: var(--bg-secondary);
+              cursor: pointer;
+            "
+          >
+            <option value="recreational" ${team.category === 'recreational' ? 'selected' : ''}>Recreational</option>
+            <option value="intermediate" ${team.category === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+            <option value="advanced" ${team.category === 'advanced' ? 'selected' : ''}>Advanced</option>
+            <option value="masters" ${team.category === 'masters' ? 'selected' : ''}>Masters</option>
+          </select>
+        </div>
+
         <!-- Team ID (read-only) -->
         <div style="margin-bottom: 20px;">
           <label style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
@@ -1217,6 +1243,7 @@ async function handleEditTeamSubmit(originalTeam, closeModal) {
 
     // Get form values
     const teamName = document.getElementById('edit-team-name').value.trim()
+    const teamCategory = document.getElementById('edit-team-category').value
     const climber1Name = document.getElementById('edit-climber1-name').value.trim()
     const climber1Age = parseInt(document.getElementById('edit-climber1-age').value)
     const climber1Grade = parseInt(document.getElementById('edit-climber1-grade').value)
@@ -1237,17 +1264,11 @@ async function handleEditTeamSubmit(originalTeam, closeModal) {
       throw new Error('Grade must be between 10 and 35 (Ewbank)')
     }
 
-    // Calculate new categories using classifyClimber for individual climbers
+    // Calculate individual climber categories
     const climber1IndividualCategory = classifyClimber(climber1Grade)
     const climber2IndividualCategory = classifyClimber(climber2Grade)
-    
-    // Calculate new team category
-    const teamCategory = classifyTeam(
-      { age: climber1Age, redpointGrade: climber1Grade },
-      { age: climber2Age, redpointGrade: climber2Grade }
-    )
 
-    // Update team name and category
+    // Update team name and category (from manual selection)
     const { error: teamError } = await supabase
       .from('teams')
       .update({ team_name: teamName, category: teamCategory })
