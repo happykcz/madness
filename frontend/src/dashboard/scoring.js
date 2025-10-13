@@ -369,21 +369,8 @@ function renderRouteCard(route) {
     >
       <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
         <div style="flex: 1;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
-              ${route.name}
-            </div>
-            ${totalSends > 0 ? `
-              <div style="
-                font-size: 11px;
-                padding: 2px 6px;
-                background-color: #6c757d;
-                color: white;
-                border-radius: 10px;
-              ">
-                ${totalSends} ${totalSends === 1 ? 'send' : 'sends'} • ${totalPoints}pts
-              </div>
-            ` : ''}
+          <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">
+            ${route.name}
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             <span style="
@@ -410,7 +397,19 @@ function renderRouteCard(route) {
           </div>
         </div>
         ${!isZeroPoint ? `
-          <div style="flex-shrink: 0; display: flex; align-items: center;">
+          <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px;">
+            ${totalSends > 0 ? `
+              <div style="
+                font-size: 11px;
+                padding: 2px 6px;
+                background-color: #e1e4e8;
+                color: #333;
+                border-radius: 3px;
+                font-weight: 600;
+              ">
+                ${totalPoints}pts
+              </div>
+            ` : ''}
             ${generateProgressIndicator(totalSends)}
           </div>
         ` : ''}
@@ -655,38 +654,47 @@ async function showAttemptModal(route) {
             Previous Sends
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            ${existingAttempts.map((attempt, index) => `
-              <div style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px 12px;
-                background-color: var(--bg-secondary);
-                border-radius: 4px;
-                font-size: 13px;
-              ">
-                <div>
-                  <span style="font-weight: 600;">Tick #${index + 1}</span>
-                  <span style="color: var(--text-secondary);"> • ${attempt.points_earned}pts</span>
-                  <span style="color: var(--text-secondary); font-size: 11px;"> • ${new Date(attempt.logged_at).toLocaleString()}</span>
+            ${existingAttempts.map((attempt, index) => {
+              const isLastSend = index === existingAttempts.length - 1
+              return `
+                <div style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 8px 12px;
+                  background-color: var(--bg-secondary);
+                  border-radius: 4px;
+                  font-size: 13px;
+                ">
+                  <div>
+                    <span style="font-weight: 600;">Tick #${index + 1}</span>
+                    <span style="color: var(--text-secondary);"> • ${attempt.points_earned}pts</span>
+                    <span style="color: var(--text-secondary); font-size: 11px;"> • ${new Date(attempt.logged_at).toLocaleString()}</span>
+                  </div>
+                  ${isLastSend ? `
+                    <button
+                      type="button"
+                      class="delete-send-btn"
+                      data-ascent-id="${attempt.id}"
+                      style="
+                        background: none;
+                        border: none;
+                        color: #dc3545;
+                        cursor: pointer;
+                        padding: 4px 8px;
+                        line-height: 1;
+                      "
+                      title="Delete this send"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </button>
+                  ` : ''}
                 </div>
-                <button
-                  type="button"
-                  class="delete-send-btn"
-                  data-ascent-id="${attempt.id}"
-                  style="
-                    background: none;
-                    border: none;
-                    color: #dc3545;
-                    cursor: pointer;
-                    font-size: 18px;
-                    padding: 4px 8px;
-                    line-height: 1;
-                  "
-                  title="Delete this send"
-                >🗑️</button>
-              </div>
-            `).join('')}
+              `
+            }).join('')}
           </div>
         </div>
       ` : ''}
@@ -697,7 +705,10 @@ async function showAttemptModal(route) {
             Cancel
           </button>
           <button type="submit" class="btn btn-primary">
-            ✅ Log Send
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+              <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+            </svg>
+            Log Send
           </button>
         </div>
       </form>
