@@ -1,0 +1,5 @@
+team_id,team_name,team_category,climber1_name,climber1_age,climber1_category,climber1_redpoint_grade,climber2_name,climber2_age,climber2_category,climber2_redpoint_grade
+team_001,Example Team,intermediate,Alice Johnson,28,intermediate,22,Bob Smith,32,advanced,25
+team_002,Rock Climbers,recreational,Charlie Davis,25,recreational,18,Diana Lee,24,recreational,19
+team_003,Summit Seekers,masters,Edward Brown,52,advanced,24,Fiona Wilson,48,intermediate,21
+team_004,Vertical Warriors,advanced,George Miller,30,advanced,26,Hannah Taylor,29,advanced,24
