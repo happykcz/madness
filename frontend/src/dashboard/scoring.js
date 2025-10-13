@@ -7,7 +7,7 @@
 import { supabase } from '../lib/supabase.js'
 import { showSuccess, showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
 import { calculateTickPoints, getTickMultiplier } from '../shared/scoring-engine.js'
-import { router } from '../lib/router.js'
+import { renderDashboard } from './dashboard.js'
 
 let currentFilters = {
   type: 'all', // 'all', 'sport', 'trad', 'boulder'
@@ -456,13 +456,11 @@ function setupScoringListeners() {
       // Remove any existing listeners
       backBtn.replaceWith(backBtn.cloneNode(true))
       const freshBtn = document.getElementById('back-to-dashboard')
-      freshBtn.addEventListener('click', (e) => {
+      freshBtn.addEventListener('click', async (e) => {
         e.preventDefault()
         e.stopPropagation()
-        console.log('Back button clicked')
-        console.log('Current hash:', window.location.hash)
-        router.navigate('/dashboard')
-        console.log('Navigate called, new hash:', window.location.hash)
+        // Re-render the dashboard (scoring is part of dashboard, not a separate route)
+        await renderDashboard()
       })
     } else {
       console.error('Back to dashboard button not found')
