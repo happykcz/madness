@@ -317,16 +317,25 @@ async function loadCompetitionStatus() {
 
 async function openCompetition() {
   try {
-    const { error } = await supabase
+    // Get settings ID first
+    const { data: settings, error: fetchError } = await supabase
+      .from('competition_settings')
+      .select('id')
+      .single()
+
+    if (fetchError) throw fetchError
+
+    // Update the settings
+    const { error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: true, updated_at: new Date().toISOString() })
-      .eq('id', (await supabase.from('competition_settings').select('id').single()).data.id)
-    
-    if (error) throw error
-    
+      .eq('id', settings.id)
+
+    if (updateError) throw updateError
+
     showNotification('✅ Competition opened successfully', 'success')
     await loadCompetitionStatus()
-    
+
   } catch (error) {
     console.error('Error opening competition:', error)
     showNotification('❌ Error opening competition: ' + error.message, 'error')
@@ -335,16 +344,25 @@ async function openCompetition() {
 
 async function closeCompetition() {
   try {
-    const { error } = await supabase
+    // Get settings ID first
+    const { data: settings, error: fetchError } = await supabase
+      .from('competition_settings')
+      .select('id')
+      .single()
+
+    if (fetchError) throw fetchError
+
+    // Update the settings
+    const { error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: false, updated_at: new Date().toISOString() })
-      .eq('id', (await supabase.from('competition_settings').select('id').single()).data.id)
-    
-    if (error) throw error
-    
+      .eq('id', settings.id)
+
+    if (updateError) throw updateError
+
     showNotification('✅ Competition closed successfully', 'success')
     await loadCompetitionStatus()
-    
+
   } catch (error) {
     console.error('Error closing competition:', error)
     showNotification('❌ Error closing competition: ' + error.message, 'error')
@@ -371,20 +389,29 @@ async function updateWindowTimes(e) {
   }
   
   try {
-    const { error } = await supabase
+    // Get settings ID first
+    const { data: settings, error: fetchError } = await supabase
+      .from('competition_settings')
+      .select('id')
+      .single()
+
+    if (fetchError) throw fetchError
+
+    // Update the window times
+    const { error: updateError } = await supabase
       .from('competition_settings')
       .update({
         competition_start: start.toISOString(),
         competition_end: end.toISOString(),
         updated_at: new Date().toISOString()
       })
-      .eq('id', (await supabase.from('competition_settings').select('id').single()).data.id)
-    
-    if (error) throw error
-    
+      .eq('id', settings.id)
+
+    if (updateError) throw updateError
+
     showNotification('✅ Window times updated successfully', 'success')
     await loadCompetitionStatus()
-    
+
   } catch (error) {
     console.error('Error updating window times:', error)
     showNotification('❌ Error updating times: ' + error.message, 'error')

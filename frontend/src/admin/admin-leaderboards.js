@@ -38,13 +38,14 @@ export async function renderLeaderboards() {
 
   try {
     // Fetch all data
-    const [teamScores, climberScores, hardestSends] = await Promise.all([
+    const [teamScores, climberScores, hardestSends, mostTicks] = await Promise.all([
       fetchTeamScores(),
       fetchClimberScores(),
-      fetchHardestSends()
+      fetchHardestSends(),
+      fetchMostTicks()
     ])
 
-    renderLeaderboardsContent(teamScores, climberScores, hardestSends)
+    renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks)
   } catch (error) {
     console.error('Error loading leaderboards:', error)
     showError('Failed to load leaderboards')
@@ -53,21 +54,39 @@ export async function renderLeaderboards() {
 
 /**
  * Fetch team scores grouped by category
+ * Also fetch climber names for each team
  */
 async function fetchTeamScores() {
-  const { data, error } = await supabase
+  // Fetch team scores
+  const { data: teamData, error: teamError } = await supabase
     .from('team_scores')
     .select('*')
     .order('total_points', { ascending: false })
 
-  if (error) throw error
+  if (teamError) throw teamError
+
+  // Fetch all climbers to get names
+  const { data: climbersData, error: climbersError } = await supabase
+    .from('climbers')
+    .select('id, team_id, name')
+
+  if (climbersError) throw climbersError
+
+  // Add climber names to each team
+  const teamsWithClimbers = teamData.map(team => {
+    const teamClimbers = climbersData.filter(c => c.team_id === team.team_id)
+    return {
+      ...team,
+      climber_names: teamClimbers.map(c => c.name).join(', ')
+    }
+  })
 
   // Group by category
   return {
-    masters: data.filter(t => t.category === 'masters'),
-    recreational: data.filter(t => t.category === 'recreational'),
-    intermediate: data.filter(t => t.category === 'intermediate'),
-    advanced: data.filter(t => t.category === 'advanced')
+    masters: teamsWithClimbers.filter(t => t.category === 'masters'),
+    recreational: teamsWithClimbers.filter(t => t.category === 'recreational'),
+    intermediate: teamsWithClimbers.filter(t => t.category === 'intermediate'),
+    advanced: teamsWithClimbers.filter(t => t.category === 'advanced')
   }
 }
 
@@ -92,12 +111,14 @@ async function fetchClimberScores() {
 
 /**
  * Fetch hardest sends (top climbers by hardest route)
+ * Tiebreaker: more route_ascents on that hardest grade wins
  */
 async function fetchHardestSends() {
   const { data, error } = await supabase
     .from('climber_scores')
     .select('*')
     .order('hardest_send', { ascending: false })
+    .order('route_ascents', { ascending: false })
     .limit(20)
 
   if (error) throw error
@@ -105,9 +126,34 @@ async function fetchHardestSends() {
 }
 
 /**
+ * Fetch most ticks (climbers by total ascents)
+ * Tiebreaker: lower category wins (recreational < intermediate < advanced)
+ */
+async function fetchMostTicks() {
+  const { data, error } = await supabase
+    .from('climber_scores')
+    .select('*')
+    .order('route_ascents', { ascending: false })
+    .limit(20)
+
+  if (error) throw error
+
+  // Apply tiebreaker: lower category wins
+  // Category order: recreational (1) < intermediate (2) < advanced (3)
+  const categoryOrder = { recreational: 1, intermediate: 2, advanced: 3 }
+  return data.sort((a, b) => {
+    if (a.route_ascents !== b.route_ascents) {
+      return b.route_ascents - a.route_ascents
+    }
+    // Tie: lower category wins
+    return categoryOrder[a.category] - categoryOrder[b.category]
+  })
+}
+
+/**
  * Render leaderboards content
  */
-function renderLeaderboardsContent(teamScores, climberScores, hardestSends) {
+function renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks) {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
@@ -142,6 +188,7 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends) {
           <button class="leaderboard-tab active" data-tab="teams">Team Categories</button>
           <button class="leaderboard-tab" data-tab="climbers">Climber Categories</button>
           <button class="leaderboard-tab" data-tab="hardest">Hardest Sends</button>
+          <button class="leaderboard-tab" data-tab="ticks">Most Ticks</button>
         </div>
 
         <!-- Tab Content -->
@@ -155,6 +202,10 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends) {
 
         <div id="tab-hardest" class="tab-content" style="display: none;">
           ${renderHardestSends(hardestSends)}
+        </div>
+
+        <div id="tab-ticks" class="tab-content" style="display: none;">
+          ${renderMostTicks(mostTicks)}
         </div>
       </main>
     </div>
@@ -248,7 +299,7 @@ function renderTeamLeaderboards(teamScores) {
                 </td>
                 <td style="padding: 12px 8px;">
                   <div style="font-weight: 600; color: var(--text-primary);">${team.team_name}</div>
-                  <div style="font-size: 12px; color: var(--text-secondary);">${team.team_id}</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">${team.climber_names || 'No climbers'}</div>
                 </td>
                 <td style="padding: 12px 8px; text-align: right;">
                   <div style="font-size: 20px; font-weight: 700; color: ${cat.color};">${team.total_points}</div>
@@ -323,7 +374,6 @@ function renderClimberLeaderboards(climberScores) {
                 </td>
                 <td style="padding: 12px 8px;">
                   <div style="font-weight: 600; color: var(--text-primary);">${climber.name}</div>
-                  <div style="font-size: 12px; color: var(--text-secondary);">Age ${climber.age || '?'}</div>
                 </td>
                 <td style="padding: 12px 8px; text-align: right;">
                   <div style="font-size: 20px; font-weight: 700; color: ${cat.color};">${climber.total_points}</div>
@@ -410,6 +460,89 @@ function renderHardestSends(hardestSends) {
                 </td>
                 <td style="padding: 12px 8px; text-align: right;">
                   <div style="font-size: 24px; font-weight: 700; color: var(--color-primary);">${climber.hardest_send || 0}</div>
+                </td>
+                <td style="padding: 12px 8px; text-align: right;">
+                  <div style="color: var(--text-primary); font-weight: 600;">${climber.total_points}</div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : `
+        <p style="color: var(--text-secondary); text-align: center; padding: 24px;">
+          No data yet
+        </p>
+      `}
+    </div>
+  `
+}
+
+/**
+ * Render most ticks leaderboard
+ */
+function renderMostTicks(mostTicks) {
+  return `
+    <div class="card">
+      <h3 style="
+        color: var(--color-primary);
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--color-primary);
+      ">
+        Top 20 Most Ticks (Total Sends)
+      </h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
+        In case of tie, lower category wins (Recreational > Intermediate > Advanced)
+      </p>
+      ${mostTicks.length > 0 ? `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-secondary);">
+              <th style="text-align: left; padding: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 600;">RANK</th>
+              <th style="text-align: left; padding: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 600;">CLIMBER</th>
+              <th style="text-align: left; padding: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 600;">CATEGORY</th>
+              <th style="text-align: right; padding: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 600;">TOTAL TICKS</th>
+              <th style="text-align: right; padding: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 600;">TOTAL POINTS</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${mostTicks.map((climber, index) => `
+              <tr style="border-bottom: 1px solid var(--border-secondary);">
+                <td style="padding: 12px 8px;">
+                  <div style="
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background-color: ${index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : 'var(--bg-secondary)'};
+                    color: ${index < 3 ? 'white' : 'var(--text-primary)'};
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    font-size: 14px;
+                  ">
+                    ${index + 1}
+                  </div>
+                </td>
+                <td style="padding: 12px 8px;">
+                  <div style="font-weight: 600; color: var(--text-primary);">${climber.name}</div>
+                </td>
+                <td style="padding: 12px 8px;">
+                  <span style="
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-size: 11px;
+                    background-color: ${getCategoryColor(climber.category)};
+                    color: white;
+                    text-transform: capitalize;
+                  ">
+                    ${climber.category}
+                  </span>
+                </td>
+                <td style="padding: 12px 8px; text-align: right;">
+                  <div style="font-size: 24px; font-weight: 700; color: var(--color-primary);">${climber.route_ascents || 0}</div>
                 </td>
                 <td style="padding: 12px 8px; text-align: right;">
                   <div style="color: var(--text-primary); font-weight: 600;">${climber.total_points}</div>
