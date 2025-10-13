@@ -206,7 +206,7 @@ function setupNavigationListeners() {
   })
 
   document.getElementById('nav-results')?.addEventListener('click', () => {
-    router.navigate('/admin/results')
+    router.navigate('/admin/leaderboards')
   })
 
   document.getElementById('nav-settings')?.addEventListener('click', () => {
