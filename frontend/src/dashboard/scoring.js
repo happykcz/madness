@@ -459,8 +459,10 @@ function setupScoringListeners() {
       freshBtn.addEventListener('click', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        console.log('Navigating to dashboard')
+        console.log('Back button clicked')
+        console.log('Current hash:', window.location.hash)
         router.navigate('/dashboard')
+        console.log('Navigate called, new hash:', window.location.hash)
       })
     } else {
       console.error('Back to dashboard button not found')
