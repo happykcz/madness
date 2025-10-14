@@ -470,6 +470,15 @@ function generateProgressIndicator(sendCount) {
 function renderRouteCard(route) {
   const isZeroPoint = route.base_points === 0
   const typeColor = route.gear_type === 'trad' ? '#d80' : route.gear_type === 'boulder' ? '#e55' : '#0366d6'
+  const gradeColor = route.gear_type === 'boulder'
+    ? (route.grade_numeric === 0 ? '#FEE100' 
+      : route.grade_numeric <= 4 ? '#E58329' 
+      : '#C90909')
+    : (route.grade_numeric <= 12 ? '#54B41A' 
+      : route.grade_numeric <= 18 ? '#FEE100' 
+      : route.grade_numeric <= 24 ? '#E58329' 
+      : '#C90909')
+  const gradeTextColor = gradeColor === '#C90909' ? 'white' : 'black'
 
   // Get sends for this route by current climber (all ascents are successful)
   const routeSends = climberAttempts.filter(a => a.route_id === route.id)
@@ -514,10 +523,11 @@ function renderRouteCard(route) {
             </span>
             <span style="
               font-size: 13px; 
-              color: var(--text-secondary);
+              color: ${gradeTextColor};
               padding: 2px 6px;
               border: 1px solid var(--border-secondary);
               border-radius: 999px;
+              background-color: ${gradeColor};
             ">
               ${route.grade}
             </span>
