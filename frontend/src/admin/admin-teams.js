@@ -120,7 +120,12 @@ async function renderTeamList() {
 function renderEmptyState() {
   return `
     <div class="card" style="text-align: center; padding: 60px 40px;">
-      <div style="font-size: 64px; margin-bottom: 16px;">👥</div>
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 16px; color: var(--text-secondary);">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
       <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 8px;">No teams yet</h3>
       <p style="color: var(--text-secondary); margin-bottom: 24px;">
         Create your first team to get started with the competition
@@ -620,7 +625,10 @@ function showTeamCredentials(teamId, password, teamName) {
       <div style="max-width: 600px; margin: 0 auto; padding: 40px 24px;">
         <!-- Success Card -->
         <div class="card" style="text-align: center;">
-          <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" style="margin-bottom: 16px;">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
           <h2 style="color: #28a745; font-size: 24px; font-weight: 600; margin-bottom: 8px;">
             Team Created Successfully!
           </h2>
@@ -676,7 +684,11 @@ function showTeamCredentials(teamId, password, teamName) {
 
           <!-- Copy Button -->
           <button id="copy-credentials" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">
-            📋 Copy Credentials to Clipboard
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy Credentials to Clipboard
           </button>
 
           <!-- Done Button -->
@@ -756,7 +768,11 @@ async function renderTeamDetail(teamId) {
             ← Back to Teams
           </button>
           <button id="edit-team-btn" class="btn btn-primary">
-            ✏️ Edit Team
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit Team
           </button>
         </div>
 

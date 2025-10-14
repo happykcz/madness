@@ -155,7 +155,7 @@ function initializeTurnstile() {
         color: #856404;
         font-size: 14px;
       ">
-        ⚠️ Turnstile not configured. Using development mode.
+        [Warning] Turnstile not configured. Using development mode.
       </div>
     `
     return
@@ -191,7 +191,7 @@ function initializeTurnstile() {
             color: #721c24;
             font-size: 14px;
           ">
-            ❌ Failed to load verification widget
+            [Error] Failed to load verification widget
           </div>
         `
       }
@@ -212,7 +212,7 @@ function initializeTurnstile() {
           color: #721c24;
           font-size: 14px;
         ">
-          ❌ Verification widget failed to load. Please check your connection.
+          [Error] Verification widget failed to load. Please check your connection.
         </div>
       `
     }
@@ -260,7 +260,7 @@ function setupLoginForm() {
           color: #721c24;
           font-size: 14px;
         ">
-          ❌ Please enter both Team ID and Password
+          [Error] Please enter both Team ID and Password
         </div>
       `
       return
@@ -279,7 +279,7 @@ function setupLoginForm() {
           color: #721c24;
           font-size: 14px;
         ">
-          ❌ Please complete the verification challenge
+          [Error] Please complete the verification challenge
         </div>
       `
       return
@@ -308,7 +308,7 @@ function setupLoginForm() {
             color: #721c24;
             font-size: 14px;
           ">
-            ❌ ${result.error || 'Login failed. Please check your credentials.'}
+            [Error] ${result.error || 'Login failed. Please check your credentials.'}
           </div>
         `
 
@@ -335,7 +335,7 @@ function setupLoginForm() {
           color: #721c24;
           font-size: 14px;
         ">
-          ❌ An unexpected error occurred. Please try again.
+          [Error] An unexpected error occurred. Please try again.
         </div>
       `
 

@@ -330,7 +330,11 @@ function renderRoutesPlaceholder() {
   if (routes.length === 0) {
     return `
       <div class="card" style="padding: 32px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🧗</div>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 16px; color: var(--text-secondary);">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
         <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px;">
           No Routes Yet
         </h3>

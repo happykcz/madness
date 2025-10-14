@@ -313,7 +313,7 @@ async function loadStatus() {
 
 async function openCompetition() {
   try {
-    console.log('🔓 Opening competition...')
+    console.log('[Competition] Opening...')
 
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
@@ -348,7 +348,7 @@ async function openCompetition() {
 
 async function closeCompetition() {
   try {
-    console.log('🔒 Closing competition...')
+    console.log('[Competition] Closing...')
 
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')

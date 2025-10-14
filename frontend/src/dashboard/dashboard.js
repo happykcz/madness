@@ -217,7 +217,12 @@ function renderDashboardContent(data) {
         <!-- Action Buttons -->
         <div style="margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap;">
           <button id="goto-scoring" class="btn btn-primary">
-            📊 Start Scoring
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <line x1="12" y1="20" x2="12" y2="10"/>
+              <line x1="18" y1="20" x2="18" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="16"/>
+            </svg>
+            Start Scoring
           </button>
         </div>
       </main>
@@ -260,7 +265,12 @@ function renderError(message) {
       <main class="container" style="padding-top: 32px;">
         <div class="card max-w-2xl mx-auto text-center">
           <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 16px;">
-            ❌ Error
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            Error
           </h2>
           <p style="color: var(--text-secondary); margin-bottom: 24px;">
             ${message}

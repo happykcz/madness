@@ -127,19 +127,19 @@ function renderHome() {
 
           <div class="mt-6 p-4" style="background-color: var(--bg-secondary); border-radius: 6px;">
             <p class="text-sm font-semibold mb-2" style="color: var(--text-primary);">
-              ✅ Phase 2 Complete
+               Phase 2 Complete
             </p>
             <p class="text-sm mb-4" style="color: var(--text-secondary);">
               Router, Auth, Scoring Engine, and UI Helpers ready
             </p>
 
             <ul class="text-sm text-left" style="color: var(--text-secondary); list-style: none; padding: 0;">
-              <li>✅ Supabase client initialized</li>
-              <li>✅ Hash-based routing for GitHub Pages</li>
-              <li>✅ Authentication manager with session handling</li>
-              <li>✅ Scoring engine with all competition rules</li>
-              <li>✅ Category classifier for teams and climbers</li>
-              <li>✅ Toast notifications and loading states</li>
+              <li> Supabase client initialized</li>
+              <li> Hash-based routing for GitHub Pages</li>
+              <li> Authentication manager with session handling</li>
+              <li> Scoring engine with all competition rules</li>
+              <li> Category classifier for teams and climbers</li>
+              <li> Toast notifications and loading states</li>
             </ul>
           </div>
 
