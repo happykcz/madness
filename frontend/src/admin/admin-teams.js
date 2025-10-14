@@ -9,6 +9,7 @@ import { router } from '../lib/router.js'
 import { supabase } from '../lib/supabase.js'
 import { showSuccess, showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
 import { classifyTeam, classifyClimber } from '../shared/category-classifier.js'
+import { renderAdminHeader, setupAdminHeader } from './admin-header.js'
 
 let currentView = 'list' // 'list', 'create', 'view'
 let selectedTeam = null
@@ -45,27 +46,10 @@ export async function renderTeamManagement() {
 }
 
 /**
- * Render header with navigation
+ * Render header with navigation (using shared component)
  */
 function renderHeader() {
-  return `
-    <div class="header" style="padding: 12px 16px;">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
-        <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
-          Team Management
-        </h1>
-      </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
-          ← Dashboard
-        </button>
-        <button id="admin-signout" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
-          Sign Out
-        </button>
-      </div>
-    </div>
-  `
+  return renderAdminHeader({ title: 'Team Management', currentPage: 'teams' })
 }
 
 /**
@@ -491,14 +475,7 @@ function setupTeamListListeners() {
     })
   })
 
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/admin/dashboard')
-  })
-
-  document.getElementById('admin-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    router.navigate('/')
-  })
+  setupAdminHeader()
 }
 
 /**
@@ -602,14 +579,7 @@ function setupCreateFormListeners() {
     renderTeamManagement()
   })
 
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/admin/dashboard')
-  })
-
-  document.getElementById('admin-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    router.navigate('/')
-  })
+  setupAdminHeader()
 }
 
 /**
@@ -725,14 +695,7 @@ Instructions:
     renderTeamManagement()
   })
 
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/admin/dashboard')
-  })
-
-  document.getElementById('admin-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    router.navigate('/')
-  })
+  setupAdminHeader()
 }
 
 /**
@@ -948,14 +911,7 @@ function setupTeamDetailListeners(team) {
     }
   })
 
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/admin/dashboard')
-  })
-
-  document.getElementById('admin-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    router.navigate('/')
-  })
+  setupAdminHeader()
 }
 
 /**

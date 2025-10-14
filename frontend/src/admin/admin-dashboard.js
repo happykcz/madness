@@ -9,6 +9,7 @@
 
 import { router } from '../lib/router.js'
 import { supabase } from '../lib/supabase.js'
+import { renderAdminHeader, setupAdminHeader } from './admin-header.js'
 
 /**
  * Render admin dashboard
@@ -61,18 +62,7 @@ function renderDashboard(stats) {
 
   app.innerHTML = `
     <div class="min-h-screen">
-      <!-- Header -->
-      <div class="header" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 40px;" />
-          <h1 style="color: white; font-size: 18px; font-weight: 600; margin: 0;">
-            Admin Portal
-          </h1>
-        </div>
-        <button id="admin-signout" class="btn btn-secondary">
-          Sign Out
-        </button>
-      </div>
+      ${renderAdminHeader({ title: 'Admin Portal', currentPage: 'dashboard' })}
 
       <!-- Main Content -->
       <div style="max-width: 1280px; margin: 0 auto; padding: 40px 24px;">
@@ -203,7 +193,8 @@ function renderDashboard(stats) {
     </style>
   `
 
-  // Setup event listeners
+  // Setup header and event listeners
+  setupAdminHeader()
   setupNavigationListeners()
 }
 
@@ -221,10 +212,5 @@ function setupNavigationListeners() {
 
   document.getElementById('nav-settings')?.addEventListener('click', () => {
     router.navigate('/admin/competition')
-  })
-
-  document.getElementById('admin-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    router.navigate('/')
   })
 }

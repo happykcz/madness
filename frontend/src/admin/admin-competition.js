@@ -6,26 +6,14 @@
 import { supabase } from '../lib/supabase.js'
 import { router } from '../lib/router.js'
 import { showSuccess, showError, showWarning } from '../shared/ui-helpers.js'
+import { renderAdminHeader, setupAdminHeader } from './admin-header.js'
 
 export async function renderCompetitionControl() {
   const app = document.getElementById('app')
 
   app.innerHTML = `
     <div style="min-height: 100vh; background-color: var(--bg-primary);">
-      <!-- Header -->
-      <header class="header" style="padding: 12px 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h1 style="color: white; font-size: 18px; font-weight: 600; margin: 0;">
-            Competition Control
-          </h1>
-          <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Back
-          </button>
-        </div>
-      </header>
+      ${renderAdminHeader({ title: 'Competition Control', currentPage: 'competition' })}
 
       <main class="container" style="padding: 16px 16px 32px;">
 
@@ -429,9 +417,7 @@ async function updateWindowTimes(e) {
 }
 
 function setupListeners() {
-  document.getElementById('back-to-dashboard')?.addEventListener('click', () => {
-    router.navigate('/admin/dashboard')
-  })
+  setupAdminHeader()
 
   document.getElementById('refresh-btn')?.addEventListener('click', loadStatus)
   document.getElementById('btn-open')?.addEventListener('click', openCompetition)

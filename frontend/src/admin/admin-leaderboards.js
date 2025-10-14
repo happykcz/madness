@@ -10,6 +10,7 @@
 
 import { supabase } from '../lib/supabase.js'
 import { showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
+import { renderAdminHeader, setupAdminHeader } from './admin-header.js'
 
 /**
  * Render admin leaderboards page
@@ -20,16 +21,7 @@ export async function renderLeaderboards() {
   // Show loading
   app.innerHTML = `
     <div class="min-h-screen" style="background-color: var(--bg-primary);">
-      <header class="header">
-        <div class="container">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h1 style="color: white; font-size: 20px; font-weight: 600;">Leaderboards</h1>
-            <button id="back-to-admin" class="btn btn-secondary">
-              ← Admin Dashboard
-            </button>
-          </div>
-        </div>
-      </header>
+      ${renderAdminHeader({ title: 'Leaderboards', currentPage: 'leaderboards' })}
       <main class="container" style="padding-top: 24px; padding-bottom: 32px;">
         <p style="color: var(--text-secondary); text-align: center;">Loading leaderboards...</p>
       </main>
@@ -158,23 +150,17 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends, most
 
   app.innerHTML = `
     <div class="min-h-screen" style="background-color: var(--bg-primary);">
-      <header class="header">
-        <div class="container">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h1 style="color: white; font-size: 20px; font-weight: 600;">Leaderboards</h1>
-            <div style="display: flex; gap: 12px;">
-              <button id="refresh-btn" class="btn btn-secondary">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle;">
-                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                </svg>
-                Refresh
-              </button>
-              <button id="back-to-admin" class="btn btn-secondary">← Dashboard</button>
-            </div>
-          </div>
-        </div>
-      </header>
+      ${renderAdminHeader({
+        title: 'Leaderboards',
+        currentPage: 'leaderboards',
+        actions: [{
+          id: 'refresh-btn',
+          label: 'Refresh',
+          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>`
+        }]
+      })}
 
       <main class="container" style="padding-top: 24px; padding-bottom: 32px;">
         <!-- Tab Navigation -->
@@ -577,10 +563,8 @@ function getCategoryColor(category) {
  * Setup event listeners
  */
 function setupLeaderboardListeners() {
-  // Back button
-  document.getElementById('back-to-admin')?.addEventListener('click', () => {
-    window.location.hash = '#/admin/dashboard'
-  })
+  // Setup header (includes navigation and sign out)
+  setupAdminHeader()
 
   // Refresh button
   document.getElementById('refresh-btn')?.addEventListener('click', async () => {
