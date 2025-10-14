@@ -41,6 +41,15 @@ async function checkCompetitionStatus() {
     const end = new Date(settings.competition_end)
     const isInWindow = now >= start && now <= end
 
+    console.log('🏁 Competition Status Check:', {
+      is_open: settings.is_open,
+      now: now.toISOString(),
+      start: start.toISOString(),
+      end: end.toISOString(),
+      isInWindow,
+      result: settings.is_open || isInWindow
+    })
+
     // Competition is active if manually opened OR within scheduled window
     return settings.is_open || isInWindow
   } catch (error) {

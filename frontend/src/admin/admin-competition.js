@@ -313,19 +313,29 @@ async function loadStatus() {
 
 async function openCompetition() {
   try {
+    console.log('🔓 Opening competition...')
+
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
-      .select('id')
+      .select('*')
       .single()
 
     if (fetchError) throw fetchError
 
-    const { error: updateError } = await supabase
+    console.log('Current settings:', settings)
+
+    const { data: updated, error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: true, updated_at: new Date().toISOString() })
       .eq('id', settings.id)
+      .select()
 
-    if (updateError) throw updateError
+    if (updateError) {
+      console.error('Update error:', updateError)
+      throw updateError
+    }
+
+    console.log('Updated settings:', updated)
 
     showSuccess('Competition opened successfully')
     await loadStatus()
@@ -338,19 +348,29 @@ async function openCompetition() {
 
 async function closeCompetition() {
   try {
+    console.log('🔒 Closing competition...')
+
     const { data: settings, error: fetchError } = await supabase
       .from('competition_settings')
-      .select('id')
+      .select('*')
       .single()
 
     if (fetchError) throw fetchError
 
-    const { error: updateError } = await supabase
+    console.log('Current settings:', settings)
+
+    const { data: updated, error: updateError } = await supabase
       .from('competition_settings')
       .update({ is_open: false, updated_at: new Date().toISOString() })
       .eq('id', settings.id)
+      .select()
 
-    if (updateError) throw updateError
+    if (updateError) {
+      console.error('Update error:', updateError)
+      throw updateError
+    }
+
+    console.log('Updated settings:', updated)
 
     showSuccess('Competition closed successfully')
     await loadStatus()
