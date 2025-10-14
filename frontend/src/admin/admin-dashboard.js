@@ -161,6 +161,26 @@ function renderDashboard(stats) {
             </div>
           </div>
 
+          <!-- Bonus Games -->
+          <div class="card hover-card" id="nav-bonus" style="cursor: pointer; transition: all 0.2s;">
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div style="flex: 1;">
+                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
+                  Bonus Games
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                  Create bonus challenges and award extra points to climbers
+                </p>
+                <div style="margin-top: 8px; color: var(--color-primary); font-weight: 500; font-size: 14px;">
+                  Manage Bonus →
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Competition Settings -->
           <div class="card hover-card" id="nav-settings" style="cursor: pointer; transition: all 0.2s;">
             <div style="display: flex; align-items: start; gap: 12px;">
@@ -208,6 +228,10 @@ function setupNavigationListeners() {
 
   document.getElementById('nav-results')?.addEventListener('click', () => {
     router.navigate('/admin/leaderboards')
+  })
+
+  document.getElementById('nav-bonus')?.addEventListener('click', () => {
+    router.navigate('/admin/bonus')
   })
 
   document.getElementById('nav-settings')?.addEventListener('click', () => {

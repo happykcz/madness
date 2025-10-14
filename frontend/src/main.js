@@ -8,6 +8,7 @@ import { renderAdminLogin } from './admin/admin-login.js'
 import { renderAdminDashboard } from './admin/admin-dashboard.js'
 import { renderTeamManagement } from './admin/admin-teams.js'
 import { renderLeaderboards } from './admin/admin-leaderboards.js'
+import { renderBonusGames } from './admin/admin-bonus.js'
 import { renderCompetitionControl } from './admin/admin-competition.js'
 import { showInfo, showSuccess } from './shared/ui-helpers.js'
 
@@ -47,6 +48,7 @@ router.registerRoutes({
   '/admin/dashboard': renderAdminDashboard,
   '/admin/teams': renderTeamManagement,
   '/admin/leaderboards': renderLeaderboards,
+  '/admin/bonus': renderBonusGames,
   '/admin/competition': renderCompetitionControl,
 })
 
