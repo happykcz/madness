@@ -17,6 +17,8 @@
   - Bottom-right notifications
   - Team total score in header
   - Back to dashboard button
+  - **Competition status enforcement (prevents scoring when closed)**
+  - Visual status badge (Open/Closed) in header
 
 ### Admin Interface
 - ✅ Admin authentication
@@ -34,15 +36,19 @@
   - ✅ Real-time ranking from database views
 - ✅ Competition control interface:
   - ✅ View current status (open/closed, manual/scheduled)
-  - ✅ Manual open/close buttons
+  - ✅ Manual open/close buttons (functional)
   - ✅ Edit scoring window times
+  - ✅ Status updates propagate to scoring page
+  - ✅ Most Ticks leaderboard (with tiebreaker)
+  - ✅ Climber names shown in team leaderboards
 
 ### Database
-- ✅ 12 migrations applied (001-012)
+- ✅ 13 migrations applied (001-013)
 - ✅ All core tables created
-- ✅ RLS policies in place
+- ✅ RLS policies enforce competition status (database-level security)
 - ✅ Views: climber_scores, team_scores
 - ✅ Routes can have base_points = 0 (non-scoreable routes)
+- ✅ Competition status uses competition_settings (not scoring_windows)
 
 ### Data Templates
 - ✅ CSV template for teams/climbers (templates/teams_climbers_template.csv)
@@ -59,8 +65,8 @@
 ### Phase A: Essential Features ✅ COMPLETE
 1. ✅ Create CSV templates (teams/climbers, routes)
 2. ✅ Add team category editing to admin interface
-3. ✅ Create leaderboard views
-4. ✅ Competition control interface
+3. ✅ Create leaderboard views (including Most Ticks)
+4. ✅ Competition control interface (with status enforcement)
 
 ### Phase B: UI/UX Polish
 5. ⏳ Replace ALL remaining emojis with SVG icons
