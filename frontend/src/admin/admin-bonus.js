@@ -377,9 +377,21 @@ async function renderAwardPoints() {
                           Awarded
                         </span>
                       ` : `
-                        <button class="btn btn-primary award-to-climber-btn" data-climber-id="${climber.id}" data-climber-name="${climber.name}" style="padding: 6px 16px;">
-                          Award ${game.points} pts
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                          <input
+                            type="number"
+                            class="form-input points-input"
+                            data-climber-id="${climber.id}"
+                            value="${game.points}"
+                            min="1"
+                            max="999"
+                            style="width: 80px; padding: 6px 8px; font-size: 14px;"
+                            placeholder="Points"
+                          />
+                          <button class="btn btn-primary award-to-climber-btn" data-climber-id="${climber.id}" data-climber-name="${climber.name}" style="padding: 6px 16px;">
+                            Award
+                          </button>
+                        </div>
                       `}
                     </div>
                   `
@@ -523,12 +535,15 @@ function setupAwardPointsListeners() {
       const climberId = e.target.getAttribute('data-climber-id')
       const climberName = e.target.getAttribute('data-climber-name')
 
-      // Get game details for points
-      const { data: game } = await supabase
-        .from('bonus_games')
-        .select('points')
-        .eq('id', selectedGame)
-        .single()
+      // Get points from input field
+      const pointsInput = document.querySelector(`.points-input[data-climber-id="${climberId}"]`)
+      const pointsAwarded = parseInt(pointsInput?.value || '0', 10)
+
+      // Validate points
+      if (!pointsAwarded || pointsAwarded < 1 || pointsAwarded > 999) {
+        showError('Please enter valid points (1-999)')
+        return
+      }
 
       try {
         const { error } = await supabase
@@ -536,12 +551,12 @@ function setupAwardPointsListeners() {
           .insert({
             climber_id: climberId,
             bonus_game_id: selectedGame,
-            points_awarded: game.points
+            points_awarded: pointsAwarded
           })
 
         if (error) throw error
 
-        showSuccess(`${game.points} bonus points awarded to ${climberName}!`)
+        showSuccess(`${pointsAwarded} bonus points awarded to ${climberName}!`)
         await renderAwardPoints()
       } catch (error) {
         if (error.code === '23505') { // Unique constraint violation

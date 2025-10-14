@@ -105,11 +105,26 @@ async function fetchTeamData() {
 
     const scores = climberScoresError ? [] : climberScores
 
+    // Fetch bonus entries for all team climbers
+    const { data: bonusEntries, error: bonusError } = await supabase
+      .from('bonus_entries')
+      .select(`
+        climber_id,
+        points_awarded,
+        bonus_games (
+          name
+        )
+      `)
+      .in('climber_id', climbers.map(c => c.id))
+
+    const bonuses = bonusError ? [] : bonusEntries
+
     return {
       team,
       climbers,
       teamScore: score,
       climberScores: scores,
+      bonusEntries: bonuses,
     }
   } catch (error) {
     console.error('Failed to fetch team data:', error)
@@ -122,7 +137,7 @@ async function fetchTeamData() {
  * Render dashboard with team data
  */
 function renderDashboardContent(data) {
-  const { team, climbers, teamScore, climberScores } = data
+  const { team, climbers, teamScore, climberScores, bonusEntries } = data
   const app = document.querySelector('#app')
 
   const totalPoints = teamScore?.total_points || 0
@@ -190,24 +205,49 @@ function renderDashboardContent(data) {
           const points = climberScore?.total_points || 0
           const ascents = climberScore?.route_ascents || 0
 
+          // Get bonus entries for this climber
+          const climberBonuses = bonusEntries.filter(b => b.climber_id === climber.id)
+          const totalBonusPoints = climberBonuses.reduce((sum, b) => sum + b.points_awarded, 0)
+
           return `
             <div class="card" style="margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div>
+                <div style="flex: 1;">
                   <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
                     ${climber.name}
                   </h4>
                   <p style="color: var(--text-secondary); font-size: 14px;">
                     Age: ${climber.age} • Grade: ${climber.redpoint_grade} • Category: ${capitalizeFirst(climber.category)}
                   </p>
+
+                  ${climberBonuses.length > 0 ? `
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-secondary);">
+                      <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        Bonus Points:
+                      </div>
+                      ${climberBonuses.map(bonus => `
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-left: 20px; margin-bottom: 2px;">
+                          • ${bonus.bonus_games.name}: <span style="color: var(--color-primary); font-weight: 600;">+${bonus.points_awarded}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
                 </div>
-                <div style="text-align: right;">
+                <div style="text-align: right; margin-left: 16px;">
                   <div style="font-size: 24px; font-weight: 600; color: #ff0046;">
                     ${points}
                   </div>
                   <div style="font-size: 12px; color: var(--text-secondary);">
                     ${ascents} ascent${ascents !== 1 ? 's' : ''}
                   </div>
+                  ${totalBonusPoints > 0 ? `
+                    <div style="font-size: 11px; color: var(--color-primary); margin-top: 4px;">
+                      +${totalBonusPoints} bonus
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             </div>
@@ -215,8 +255,8 @@ function renderDashboardContent(data) {
         }).join('')}
 
         <!-- Action Buttons -->
-        <div style="margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap;">
-          <button id="goto-scoring" class="btn btn-primary">
+        <div style="margin-top: 32px;">
+          <button id="goto-scoring" class="btn btn-primary" style="width: 100%;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
               <line x1="12" y1="20" x2="12" y2="10"/>
               <line x1="18" y1="20" x2="18" y2="4"/>
