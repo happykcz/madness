@@ -19,6 +19,35 @@ let routes = []
 let teamData = null
 let selectedClimber = null
 let climberAttempts = [] // All attempts for selected climber
+let competitionActive = false // Track competition status
+
+/**
+ * Check if competition is currently active
+ */
+async function checkCompetitionStatus() {
+  try {
+    const { data: settings, error } = await supabase
+      .from('competition_settings')
+      .select('is_open, competition_start, competition_end')
+      .single()
+
+    if (error) {
+      console.error('Error checking competition status:', error)
+      return false
+    }
+
+    const now = new Date()
+    const start = new Date(settings.competition_start)
+    const end = new Date(settings.competition_end)
+    const isInWindow = now >= start && now <= end
+
+    // Competition is active if manually opened OR within scheduled window
+    return settings.is_open || isInWindow
+  } catch (error) {
+    console.error('Error checking competition status:', error)
+    return false
+  }
+}
 
 /**
  * Render scoring interface
@@ -29,6 +58,9 @@ export async function renderScoring(team, climbers, climberScores) {
   // Reset state on page load
   selectedClimber = null
   climberAttempts = []
+
+  // Check competition status
+  competitionActive = await checkCompetitionStatus()
 
   // Fetch routes
   await fetchRoutes()
@@ -47,9 +79,48 @@ export async function renderScoring(team, climbers, climberScores) {
           <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
             <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 32px;" />
             <div style="flex: 1;">
-              <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
-                ${team.team_name}
-              </h1>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
+                  ${team.team_name}
+                </h1>
+                ${competitionActive ? `
+                  <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 10px;
+                    padding: 2px 6px;
+                    background-color: #28a745;
+                    color: white;
+                    border-radius: 999px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                  ">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    Open
+                  </span>
+                ` : `
+                  <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 10px;
+                    padding: 2px 6px;
+                    background-color: #dc3545;
+                    color: white;
+                    border-radius: 999px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                  ">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    Closed
+                  </span>
+                `}
+              </div>
               <div style="color: rgba(255,255,255,0.8); font-size: 12px;">
                 Team Total: <span style="color: var(--color-primary); font-weight: 600;">${teamTotalPoints} pts</span> • ${teamTotalAscents} sends
               </div>
@@ -345,7 +416,7 @@ function generateProgressIndicator(sendCount) {
  */
 function renderRouteCard(route) {
   const isZeroPoint = route.base_points === 0
-  const typeColor = route.gear_type === 'trad' ? '#ff0046' : route.gear_type === 'boulder' ? '#6f42c1' : '#0366d6'
+  const typeColor = route.gear_type === 'trad' ? '#d80' : route.gear_type === 'boulder' ? '#e55' : '#0366d6'
 
   // Get sends for this route by current climber (all ascents are successful)
   const routeSends = climberAttempts.filter(a => a.route_id === route.id)
@@ -374,20 +445,27 @@ function renderRouteCard(route) {
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             <span style="
-              font-size: 12px;
-              padding: 2px 6px;
-              background-color: ${typeColor};
-              color: white;
+              font-size: 11px;
+              padding: 0px 3px;
+              border: 1px solid ${typeColor};
+              border-left-width: 3px;
+              color: black;
               border-radius: 3px;
             ">
-              ${route.gear_type.toUpperCase()}
+              ${route.gear_type.substring(0,1).toUpperCase() + route.gear_type.substring(1).toLowerCase()}
             </span>
-            <span style="font-size: 13px; color: var(--text-secondary);">
-              Grade ${route.grade}
+            <span style="
+              font-size: 13px; 
+              color: var(--text-secondary);
+              padding: 2px 6px;
+              border: 1px solid var(--border-secondary);
+              border-radius: 999px;
+            ">
+              ${route.grade}
             </span>
             ${isZeroPoint ? `
               <span style="font-size: 12px; color: var(--text-secondary); font-style: italic;">
-                0 pts (navigation)
+                (out of competition)
               </span>
             ` : `
               <span style="font-size: 13px; color: var(--color-primary); font-weight: 600;">
@@ -494,11 +572,19 @@ function setupScoringListeners() {
 
   // Route card clicks
   document.querySelectorAll('.route-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', async () => {
       if (!selectedClimber) {
         showError('Please select a climber first')
         return
       }
+
+      // Check competition status before allowing send
+      competitionActive = await checkCompetitionStatus()
+      if (!competitionActive) {
+        showError('Competition is currently closed')
+        return
+      }
+
       const routeId = card.getAttribute('data-route-id')
       const route = routes.find(r => r.id === routeId)
       if (route) {
@@ -564,11 +650,19 @@ function updateRoutesList() {
     container.innerHTML = renderRoutesPlaceholder()
     // Re-attach route card listeners
     document.querySelectorAll('.route-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', async () => {
         if (!selectedClimber) {
           showError('Please select a climber first')
           return
         }
+
+        // Check competition status before allowing send
+        competitionActive = await checkCompetitionStatus()
+        if (!competitionActive) {
+          showError('Competition is currently closed')
+          return
+        }
+
         const routeId = card.getAttribute('data-route-id')
         const route = routes.find(r => r.id === routeId)
         if (route) {
@@ -780,6 +874,17 @@ async function showAttemptModal(route) {
     e.preventDefault()
 
     try {
+      showLoading('Checking competition status...')
+
+      // Final competition status check before submission
+      competitionActive = await checkCompetitionStatus()
+      if (!competitionActive) {
+        hideLoading()
+        showError('Competition is currently closed')
+        closeModal()
+        return
+      }
+
       showLoading('Logging send...')
 
       // Insert ascent record (team_id is auto-set by trigger)
