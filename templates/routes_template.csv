@@ -1,18 +1,18 @@
 name,grade,grade_numeric,gear_type,base_points,sector,sector_order,route_order
-Dark Side of the Moon,18,18,sport,12.00,Main Area,0,1
-Crimson Tide,19,19,sport,13.50,Main Area,0,2
-Vertical Limit,20,20,sport,15.00,Main Area,0,3
-The Abyss,21,21,sport,17.50,Main Area,0,4
-Overhanging Wall,22,22,sport,20.00,Main Area,0,5
-Iron Cross,23,23,sport,23.00,Main Area,0,6
-The Hulk,24,24,sport,27.00,Main Area,0,7
-Project X,25,25,sport,32.00,Main Area,0,8
-Trad Master,20,20,trad,15.00,Trad Section,1,1
-Crack Attack,21,21,trad,17.50,Trad Section,1,2
-Finger Lock,22,22,trad,20.00,Trad Section,1,3
-Chimney Sweep,23,23,trad,23.00,Trad Section,1,4
-Boulder Problem 1,V3,18,boulder,12.00,Boulder Zone,2,1
-Boulder Problem 2,V4,19,boulder,13.50,Boulder Zone,2,2
-Boulder Problem 3,V5,20,boulder,15.00,Boulder Zone,2,3
-Navigation Route,15,15,sport,0.00,Warm Up,3,1
-Half Point Route,17,17,sport,7.50,Warm Up,3,2
+Dark Side of the Moon,18,18,sport,12,Main Area,0,1
+Crimson Tide,19,19,sport,15,Main Area,0,2
+Vertical Limit,20,20,sport,18,Main Area,0,3
+The Abyss,21,21,sport,20,Main Area,0,4
+Overhanging Wall,22,22,sport,22,Main Area,0,5
+Iron Cross,23,23,sport,25,Main Area,0,6
+The Hulk,24,24,sport,28,Main Area,0,7
+Project X,25,25,sport,32,Main Area,0,8
+Trad Master,20,20,trad,18,Trad Section,1,1
+Crack Attack,21,21,trad,20,Trad Section,1,2
+Finger Lock,22,22,trad,22,Trad Section,1,3
+Chimney Sweep,23,23,trad,25,Trad Section,1,4
+Boulder Problem 1,V3,18,boulder,12,Boulder Zone,2,1
+Boulder Problem 2,V4,19,boulder,15,Boulder Zone,2,2
+Boulder Problem 3,V5,20,boulder,18,Boulder Zone,2,3
+Navigation Route,15,15,sport,0,Warm Up,3,1
+Easy Warmup,12,12,sport,8,Warm Up,3,2

@@ -20,6 +20,7 @@ let teamData = null
 let selectedClimber = null
 let climberAttempts = [] // All attempts for selected climber
 let competitionActive = false // Track competition status
+let collapsedSectors = new Set() // Track which sectors are collapsed
 
 /**
  * Check if competition is currently active
@@ -183,8 +184,22 @@ export async function renderScoring(team, climbers, climberScores) {
 
         <!-- Filters -->
         <div class="card" style="margin-bottom: 16px; padding: 12px;">
-          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-            Filters
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">
+              Filters
+            </div>
+            <button id="toggle-all-sectors" class="btn" style="
+              font-size: 12px;
+              padding: 4px 8px;
+              background-color: var(--bg-secondary);
+              color: var(--text-primary);
+              border: 1px solid var(--border-primary);
+            ">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+              Expand All
+            </button>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <!-- Type Filter -->
@@ -355,17 +370,42 @@ function renderRoutesList() {
 
   let html = ''
   Object.entries(sectors).forEach(([sectorName, sectorRoutes]) => {
+    const isCollapsed = collapsedSectors.has(sectorName)
+    const toggleIcon = isCollapsed
+      ? '<polyline points="9 18 15 12 9 6"/>' // Right arrow
+      : '<polyline points="6 9 12 15 18 9"/>' // Down arrow
+
     html += `
       <div class="card" style="margin-bottom: 16px; padding: 0; overflow: hidden;">
-        <div style="background-color: var(--bg-secondary); padding: 12px 16px; border-bottom: 1px solid var(--border-secondary);">
-          <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0;">
-            ${sectorName}
-          </h3>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-            ${sectorRoutes.length} routes
+        <div
+          class="sector-header"
+          data-sector="${sectorName}"
+          style="
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-bottom: ${isCollapsed ? 'none' : '1px solid var(--border-secondary)'};
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              ${toggleIcon}
+            </svg>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0;">
+                ${sectorName}
+              </h3>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                ${sectorRoutes.length} routes
+              </div>
+            </div>
           </div>
         </div>
-        <div style="padding: 8px;">
+        <div class="sector-routes" data-sector="${sectorName}" style="padding: 8px; display: ${isCollapsed ? 'none' : 'block'};">
           ${sectorRoutes.map(route => renderRouteCard(route)).join('')}
         </div>
       </div>
@@ -432,6 +472,11 @@ function renderRouteCard(route) {
   const totalSends = routeSends.length
   const totalPoints = routeSends.reduce((sum, a) => sum + (a.points_earned || 0), 0)
 
+  // Calculate first-attempt points (rounded) for display
+  const isTrad = route.gear_type === 'trad'
+  const tradMultiplier = isTrad ? 1.5 : 1.0
+  const firstAttemptPoints = Math.floor(route.base_points * tradMultiplier)
+
   return `
     <div
       class="route-card"
@@ -478,7 +523,7 @@ function renderRouteCard(route) {
               </span>
             ` : `
               <span style="font-size: 13px; color: var(--color-primary); font-weight: 600;">
-                ${route.base_points} pts${route.gear_type === 'trad' ? ' +50%' : ''}
+                ${firstAttemptPoints} pts${route.gear_type === 'trad' ? ' (trad)' : ''}
               </span>
             `}
           </div>
@@ -579,6 +624,38 @@ function setupScoringListeners() {
     updateRoutesList()
   })
 
+  // Toggle all sectors button
+  document.getElementById('toggle-all-sectors')?.addEventListener('click', () => {
+    const allSectors = [...document.querySelectorAll('.sector-header')].map(h => h.getAttribute('data-sector'))
+
+    if (collapsedSectors.size === 0) {
+      // Collapse all
+      allSectors.forEach(sector => collapsedSectors.add(sector))
+    } else {
+      // Expand all
+      collapsedSectors.clear()
+    }
+
+    updateRoutesList()
+    updateToggleAllButton()
+  })
+
+  // Sector header clicks
+  document.querySelectorAll('.sector-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const sectorName = header.getAttribute('data-sector')
+
+      if (collapsedSectors.has(sectorName)) {
+        collapsedSectors.delete(sectorName)
+      } else {
+        collapsedSectors.add(sectorName)
+      }
+
+      updateRoutesList()
+      updateToggleAllButton()
+    })
+  })
+
   // Route card clicks
   document.querySelectorAll('.route-card').forEach(card => {
     card.addEventListener('click', async () => {
@@ -651,12 +728,55 @@ async function selectClimber(climberId, climberIndex) {
 }
 
 /**
+ * Update toggle all button text based on current state
+ */
+function updateToggleAllButton() {
+  const btn = document.getElementById('toggle-all-sectors')
+  if (!btn) return
+
+  const allCollapsed = collapsedSectors.size > 0
+
+  if (allCollapsed) {
+    btn.innerHTML = `
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+      Expand All
+    `
+  } else {
+    btn.innerHTML = `
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+        <polyline points="18 15 12 9 6 15"/>
+      </svg>
+      Collapse All
+    `
+  }
+}
+
+/**
  * Update routes list after filter change
  */
 function updateRoutesList() {
   const container = document.getElementById('routes-container')
   if (container) {
     container.innerHTML = renderRoutesPlaceholder()
+
+    // Re-attach sector header listeners
+    document.querySelectorAll('.sector-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const sectorName = header.getAttribute('data-sector')
+
+        if (collapsedSectors.has(sectorName)) {
+          collapsedSectors.delete(sectorName)
+        } else {
+          collapsedSectors.add(sectorName)
+        }
+
+        updateRoutesList()
+        updateToggleAllButton()
+      })
+    })
+
     // Re-attach route card listeners
     document.querySelectorAll('.route-card').forEach(card => {
       card.addEventListener('click', async () => {
