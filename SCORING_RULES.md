@@ -10,13 +10,13 @@ Final Points = FLOOR(base_points × trad_multiplier × repeat_multiplier)
 
 ## Base Points
 
-- **Type:** NUMERIC(5,2) - supports decimal values
-- **No restrictions:** Can be any value from 0.00 to 999.99
+- **Type:** INTEGER - whole numbers only
+- **No restrictions:** Can be any value from 0 to 999
 - **Examples:**
-  - `0.00` - Non-scoreable navigation/warm-up routes
-  - `7.50` - Half-point routes
-  - `12.00`, `15.00`, `20.00` - Standard point routes
-  - `12.75` - Fractional point values allowed
+  - `0` - Non-scoreable navigation/warm-up routes
+  - `12`, `15`, `20` - Standard point routes
+  - `8`, `10`, `25` - Custom point values
+- **Reasoning:** Simpler mental math, clearer per-send points, easier debugging
 
 ## Trad Bonus Multiplier
 
@@ -37,25 +37,22 @@ Final Points = FLOOR(base_points × trad_multiplier × repeat_multiplier)
 
 ### Examples:
 
-**Sport Route (base_points = 12.00):**
-- 1st attempt: `FLOOR(12.00 × 1.0 × 1.00)` = **12 points**
-- 2nd attempt: `FLOOR(12.00 × 1.0 × 0.75)` = **9 points**
-- 3rd attempt: `FLOOR(12.00 × 1.0 × 0.50)` = **6 points**
-- 4th attempt: `FLOOR(12.00 × 1.0 × 0.25)` = **3 points**
+**Sport Route (base_points = 12):**
+- 1st attempt: `FLOOR(12 × 1.0 × 1.00)` = **12 points**
+- 2nd attempt: `FLOOR(12 × 1.0 × 0.75)` = **9 points**
+- 3rd attempt: `FLOOR(12 × 1.0 × 0.50)` = **6 points**
+- 4th attempt: `FLOOR(12 × 1.0 × 0.25)` = **3 points**
 - 5th+ attempt: **0 points**
 
-**Trad Route (base_points = 15.00):**
-- 1st attempt: `FLOOR(15.00 × 1.5 × 1.00)` = **22 points** (trad bonus!)
-- 2nd attempt: `FLOOR(15.00 × 1.5 × 0.75)` = **16 points**
-- 3rd attempt: `FLOOR(15.00 × 1.5 × 0.50)` = **11 points**
-- 4th attempt: `FLOOR(15.00 × 1.5 × 0.25)` = **5 points**
+**Trad Route (base_points = 15):**
+- 1st attempt: `FLOOR(15 × 1.5 × 1.00)` = **22 points** (trad bonus!)
+- 2nd attempt: `FLOOR(15 × 1.5 × 0.75)` = **16 points**
+- 3rd attempt: `FLOOR(15 × 1.5 × 0.50)` = **11 points**
+- 4th attempt: `FLOOR(15 × 1.5 × 0.25)` = **5 points**
 - 5th+ attempt: **0 points**
 
-**Decimal Base Points (base_points = 12.50):**
-- 1st attempt: `FLOOR(12.50 × 1.0 × 1.00)` = **12 points**
-- 2nd attempt: `FLOOR(12.50 × 1.0 × 0.75)` = **9 points** (9.375 → 9)
-- 3rd attempt: `FLOOR(12.50 × 1.0 × 0.50)` = **6 points** (6.25 → 6)
-- 4th attempt: `FLOOR(12.50 × 1.0 × 0.25)` = **3 points** (3.125 → 3)
+**Zero Point Route (base_points = 0):**
+- All attempts: **0 points** (navigation/warm-up routes)
 
 ## Implementation
 
@@ -71,9 +68,10 @@ CREATE OR REPLACE FUNCTION calculate_ascent_points(
 RETURNS INTEGER
 ```
 
-**Location:** 
+**Location:**
 - Original: `supabase/migrations/001_initial_schema.sql`
-- Updated: `supabase/migrations/012_allow_zero_base_points.sql`
+- Decimal support: `supabase/migrations/012_allow_zero_base_points.sql`
+- **Current: `supabase/migrations/015_revert_base_points_to_integer.sql`**
 
 ### Helper Function
 
@@ -97,7 +95,7 @@ CREATE TABLE routes (
   grade VARCHAR(10) NOT NULL,
   grade_numeric INTEGER NOT NULL,
   gear_type VARCHAR(20) NOT NULL,
-  base_points NUMERIC(5,2) NOT NULL,  -- Changed from INTEGER
+  base_points INTEGER NOT NULL,  -- INTEGER for whole numbers
   sector VARCHAR(100),
   sector_order INTEGER DEFAULT 0,
   route_order INTEGER DEFAULT 0,
@@ -151,11 +149,17 @@ Scoring rules are also stored in `competition_settings` table for reference:
 - Added tick_multipliers to competition_settings
 - **✅ CORRECT** - Documented 4 scoring attempts
 
-### Migration 012 (Current)
+### Migration 012 (Decimal Support)
 - Removed base_points constraint entirely
 - Changed base_points: INTEGER → NUMERIC(5,2)
 - Updated `calculate_ascent_points()` function
 - **✅ CORRECT** - Implements 4 scoring attempts (100%, 75%, 50%, 25%)
+
+### Migration 015 (Current)
+- Reverted base_points: NUMERIC(5,2) → INTEGER
+- Simplified scoring with whole numbers only
+- Updated `calculate_ascent_points()` to use INTEGER
+- **✅ CORRECT** - Maintains 4 scoring attempts with simpler math
 
 ## Testing Examples
 
@@ -180,6 +184,8 @@ INSERT INTO ascents VALUES (climber_id, route_id_trad);   -- 4th: 5 pts
 
 - Final points always rounded DOWN via `FLOOR()`
 - This ensures integer point values in leaderboards
-- Decimal base_points provide flexibility for competition organizers
+- **Base points are INTEGER** - whole numbers only for simplicity
 - Maximum 4 scoring attempts prevents point farming
 - 5th and subsequent attempts still trackable but award 0 points
+- Trad routes get 50% bonus (15 base → 22 points first attempt)
+- Zero-point routes (base_points = 0) used for navigation/warm-up
