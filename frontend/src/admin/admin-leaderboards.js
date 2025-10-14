@@ -150,19 +150,22 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends, most
 
   app.innerHTML = `
     <div class="min-h-screen" style="background-color: var(--bg-primary);">
-      ${renderAdminHeader({
-        title: 'Leaderboards',
-        currentPage: 'leaderboards',
-        actions: [{
-          id: 'refresh-btn',
-          label: 'Refresh',
-          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-          </svg>`
-        }]
-      })}
+      ${renderAdminHeader({ title: 'Leaderboards', currentPage: 'leaderboards' })}
 
       <main class="container" style="padding-top: 24px; padding-bottom: 32px;">
+        <!-- Page Header with Refresh -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin: 0;">
+            Competition Leaderboards
+          </h2>
+          <button id="refresh-btn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+            Refresh
+          </button>
+        </div>
+
         <!-- Tab Navigation -->
         <div style="
           display: flex;

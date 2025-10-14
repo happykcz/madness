@@ -12,13 +12,11 @@ import { supabase } from '../lib/supabase.js'
  * @param {Object} options - Configuration options
  * @param {string} options.title - Page title
  * @param {string} options.currentPage - Current page identifier for active state
- * @param {Array<Object>} options.actions - Additional action buttons [{label, id, icon}]
  */
 export function renderAdminHeader(options = {}) {
   const {
     title = 'Admin Portal',
-    currentPage = 'dashboard',
-    actions = []
+    currentPage = 'dashboard'
   } = options
 
   // Navigation items
@@ -43,9 +41,8 @@ export function renderAdminHeader(options = {}) {
           </h1>
         </div>
 
-        <!-- Right: Navigation Dropdown + Actions + Sign Out -->
+        <!-- Right: Navigation Dropdown -->
         <div style="display: flex; align-items: center; gap: 8px;">
-          <!-- Navigation Dropdown -->
           <div class="admin-nav-dropdown" style="position: relative;">
             <button
               id="admin-nav-toggle"
@@ -130,18 +127,6 @@ export function renderAdminHeader(options = {}) {
               </button>
             </div>
           </div>
-
-          <!-- Additional Action Buttons -->
-          ${actions.map(action => `
-            <button
-              id="${action.id}"
-              class="btn btn-secondary"
-              style="font-size: 13px; padding: 6px 12px; display: flex; align-items: center; gap: 6px;"
-            >
-              ${action.icon || ''}
-              ${action.label}
-            </button>
-          `).join('')}
         </div>
       </div>
     </header>
