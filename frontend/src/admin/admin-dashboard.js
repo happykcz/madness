@@ -181,6 +181,26 @@ function renderDashboard(stats) {
             </div>
           </div>
 
+          <!-- Leaderboard Nudge -->
+          <div class="card hover-card" id="nav-nudge" style="cursor: pointer; transition: all 0.2s;">
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div style="flex: 1;">
+                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
+                  Leaderboard Nudges
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                  Send announcements and reminders to check leaderboards
+                </p>
+                <div style="margin-top: 8px; color: var(--color-primary); font-weight: 500; font-size: 14px;">
+                  Manage Nudges →
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Competition Settings -->
           <div class="card hover-card" id="nav-settings" style="cursor: pointer; transition: all 0.2s;">
             <div style="display: flex; align-items: start; gap: 12px;">
@@ -232,6 +252,10 @@ function setupNavigationListeners() {
 
   document.getElementById('nav-bonus')?.addEventListener('click', () => {
     router.navigate('/admin/bonus')
+  })
+
+  document.getElementById('nav-nudge')?.addEventListener('click', () => {
+    router.navigate('/admin/nudge')
   })
 
   document.getElementById('nav-settings')?.addEventListener('click', () => {

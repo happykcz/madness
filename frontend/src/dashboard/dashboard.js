@@ -9,6 +9,7 @@ import { authManager } from '../auth/auth-manager.js'
 import { supabase } from '../lib/supabase.js'
 import { showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
 import { renderScoring } from './scoring.js'
+import { renderNudgeBanner, setupNudgeBannerListeners } from '../shared/nudge-banner.js'
 
 /**
  * Render team dashboard
@@ -50,7 +51,7 @@ export async function renderDashboard() {
       return
     }
 
-    renderDashboardContent(teamData)
+    await renderDashboardContent(teamData)
   } catch (error) {
     console.error('Dashboard error:', error)
     renderError('An error occurred while loading the dashboard')
@@ -136,12 +137,15 @@ async function fetchTeamData() {
 /**
  * Render dashboard with team data
  */
-function renderDashboardContent(data) {
+async function renderDashboardContent(data) {
   const { team, climbers, teamScore, climberScores, bonusEntries } = data
   const app = document.querySelector('#app')
 
   const totalPoints = teamScore?.total_points || 0
   const totalAscents = teamScore?.total_ascents || 0
+
+  // Fetch nudge banner HTML
+  const nudgeBannerHTML = await renderNudgeBanner(team)
 
   app.innerHTML = `
     <div class="min-h-screen" style="background-color: var(--bg-primary);">
@@ -160,6 +164,9 @@ function renderDashboardContent(data) {
       </header>
 
       <main class="container" style="padding-top: 32px; padding-bottom: 32px;">
+        <!-- Nudge Banner -->
+        ${nudgeBannerHTML}
+
         <!-- Team Info Card -->
         <div class="card" style="margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -273,6 +280,9 @@ function renderDashboardContent(data) {
   document.getElementById('sign-out-btn')?.addEventListener('click', async () => {
     await authManager.signOut()
   })
+
+  // Setup nudge banner listeners
+  setupNudgeBannerListeners()
 
   // Setup scoring button
   document.getElementById('goto-scoring')?.addEventListener('click', async () => {

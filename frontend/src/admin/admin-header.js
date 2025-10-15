@@ -19,12 +19,19 @@ export function renderAdminHeader(options = {}) {
     currentPage = 'dashboard'
   } = options
 
+  // Send icon
+  const sendIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M22 2L11 13"/>
+    <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+  </svg>`
+
   // Navigation items
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', path: '/admin/dashboard', icon: homeIcon },
     { id: 'teams', label: 'Team Management', path: '/admin/teams', icon: usersIcon },
     { id: 'leaderboards', label: 'Leaderboards', path: '/admin/leaderboards', icon: trophyIcon },
     { id: 'bonus', label: 'Bonus Games', path: '/admin/bonus', icon: starIcon },
+    { id: 'nudge', label: 'Leaderboard Nudges', path: '/admin/nudge', icon: sendIcon },
     { id: 'competition', label: 'Competition Control', path: '/admin/competition', icon: settingsIcon }
   ]
 

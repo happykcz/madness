@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase.js'
 import { showSuccess, showError, showLoading, hideLoading } from '../shared/ui-helpers.js'
 import { calculateTickPoints, getTickMultiplier } from '../shared/scoring-engine.js'
 import { renderDashboard } from './dashboard.js'
+import { renderNudgeBanner, setupNudgeBannerListeners } from '../shared/nudge-banner.js'
 
 let currentFilters = {
   type: 'all', // 'all', 'sport', 'trad', 'boulder'
@@ -79,6 +80,9 @@ export async function renderScoring(team, climbers, climberScores) {
   const teamTotalPoints = climberScores.reduce((sum, score) => sum + (score?.total_points || 0), 0)
   const teamTotalAscents = climberScores.reduce((sum, score) => sum + (score?.route_ascents || 0), 0)
 
+  // Fetch nudge banner HTML
+  const nudgeBannerHTML = await renderNudgeBanner(team)
+
   const app = document.querySelector('#app')
 
   app.innerHTML = `
@@ -144,6 +148,9 @@ export async function renderScoring(team, climbers, climberScores) {
 
       <!-- Main Content -->
       <main class="container" style="padding-top: 16px; padding-bottom: 32px;">
+        <!-- Nudge Banner -->
+        ${nudgeBannerHTML}
+
         <!-- Climber Selection -->
         <div class="card" style="margin-bottom: 16px; padding: 12px;">
           <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
@@ -256,6 +263,7 @@ export async function renderScoring(team, climbers, climberScores) {
   `
 
   setupScoringListeners()
+  setupNudgeBannerListeners()
 }
 
 /**
