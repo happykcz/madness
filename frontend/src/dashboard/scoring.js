@@ -385,7 +385,7 @@ function renderRoutesList() {
           class="sector-header"
           data-sector="${sectorName}"
           style="
-            background-color: var(--bg-secondary);
+            background-color: var(--color-primary-alpha);
             padding: 12px 16px;
             border-bottom: ${isCollapsed ? 'none' : '1px solid var(--border-secondary)'};
             cursor: pointer;
@@ -400,11 +400,11 @@ function renderRoutesList() {
               ${toggleIcon}
             </svg>
             <div>
-              <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0;">
+              <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0;">
                 ${sectorName}
-              </h3>
-              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-                ${sectorRoutes.length} routes
+                <span style="font-size: 16px; color: var(--text-secondary); margin-left: 0px;">
+                  • ${sectorRoutes.length} routes
+                </span>
               </div>
             </div>
           </div>
@@ -425,7 +425,7 @@ function renderRoutesList() {
 function generateProgressIndicator(sendCount) {
   const maxSends = 4
   const filled = Math.min(sendCount, maxSends)
-  const fillColor = '#28a745'
+  const fillColor = '#e91e63' //'#28a745'
   const emptyColor = '#e1e4e8'
 
   // Create 4 wedges (90 degrees each)
@@ -511,32 +511,32 @@ function renderRouteCard(route) {
             ${route.name}
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="
-              font-size: 11px;
-              padding: 0px 3px;
-              border: 1px solid ${typeColor};
-              border-left-width: 3px;
-              color: black;
-              border-radius: 3px;
-            ">
-              ${route.gear_type.substring(0,1).toUpperCase() + route.gear_type.substring(1).toLowerCase()}
-            </span>
-            <span style="
-              font-size: 13px; 
-              color: ${gradeTextColor};
-              padding: 2px 6px;
-              border: 1px solid var(--border-secondary);
-              border-radius: 999px;
-              background-color: ${gradeColor};
-            ">
-              ${route.grade}
-            </span>
             ${isZeroPoint ? `
               <span style="font-size: 12px; color: var(--text-secondary); font-style: italic;">
                 (out of competition)
               </span>
             ` : `
-              <span style="font-size: 13px; color: var(--color-primary); font-weight: 600;">
+              <span style="
+                font-size: 11px;
+                padding: 0px 3px;
+                border: 1px solid ${typeColor};
+                border-left-width: 3px;
+                color: black;
+                border-radius: 3px;
+              ">
+                ${route.gear_type.substring(0,1).toUpperCase() + route.gear_type.substring(1).toLowerCase()}
+              </span>
+              <span style="
+                font-size: 13px; 
+                color: ${gradeTextColor};
+                padding: 0px 3px;
+                border: 1px solid var(--border-secondary);
+                border-radius: 999px;
+                background-color: ${gradeColor};
+              ">
+                ${route.grade}
+              </span>
+              <span style="font-size: 13px; color: black; font-weight: 600;">
                 ${firstAttemptPoints} pts${route.gear_type === 'trad' ? ' (trad)' : ''}
               </span>
             `}

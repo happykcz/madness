@@ -30,14 +30,15 @@ export async function renderLeaderboards() {
 
   try {
     // Fetch all data
-    const [teamScores, climberScores, hardestSends, mostTicks] = await Promise.all([
+    const [teamScores, climberScores, hardestSends, mostTicks, bonusGames] = await Promise.all([
       fetchTeamScores(),
       fetchClimberScores(),
       fetchHardestSends(),
-      fetchMostTicks()
+      fetchMostTicks(),
+      fetchBonusGamesLeaderboard()
     ])
 
-    renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks)
+    renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks, bonusGames)
   } catch (error) {
     console.error('Error loading leaderboards:', error)
     showError('Failed to load leaderboards')
@@ -143,9 +144,66 @@ async function fetchMostTicks() {
 }
 
 /**
+ * Fetch bonus games leaderboard
+ * Shows top 5 climbers for each active bonus game
+ */
+async function fetchBonusGamesLeaderboard() {
+  // Fetch all active bonus games
+  const { data: games, error: gamesError } = await supabase
+    .from('bonus_games')
+    .select('*')
+    .eq('is_active', true)
+    .order('name')
+
+  if (gamesError) throw gamesError
+
+  if (!games || games.length === 0) {
+    return []
+  }
+
+  // Fetch bonus entries with climber info for each game
+  const gamesWithLeaders = await Promise.all(
+    games.map(async (game) => {
+      const { data: entries, error: entriesError } = await supabase
+        .from('bonus_entries')
+        .select(`
+          points_awarded,
+          climbers (
+            id,
+            name,
+            category,
+            team_id,
+            teams (
+              team_name
+            )
+          )
+        `)
+        .eq('bonus_game_id', game.id)
+        .order('points_awarded', { ascending: false })
+        .limit(5)
+
+      if (entriesError) {
+        console.error('Error fetching entries for game:', game.name, entriesError)
+        return {
+          ...game,
+          topClimbers: []
+        }
+      }
+
+      return {
+        ...game,
+        topClimbers: entries || []
+      }
+    })
+  )
+
+  return gamesWithLeaders
+}
+
+/**
  * Render leaderboards content
  */
-function renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks) {
+function renderLeaderboardsContent(teamScores, climberScores, hardestSends, mostTicks, bonusGames) {
   const app = document.querySelector('#app')
 
   app.innerHTML = `
@@ -166,18 +224,18 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends, most
           </button>
         </div>
 
-        <!-- Tab Navigation -->
-        <div style="
-          display: flex;
-          gap: 8px;
-          margin-bottom: 24px;
-          border-bottom: 2px solid var(--border-secondary);
-          overflow-x: auto;
-        ">
-          <button class="leaderboard-tab active" data-tab="teams">Team Categories</button>
-          <button class="leaderboard-tab" data-tab="climbers">Climber Categories</button>
-          <button class="leaderboard-tab" data-tab="hardest">Hardest Sends</button>
-          <button class="leaderboard-tab" data-tab="ticks">Most Ticks</button>
+        <!-- Mobile-Friendly Tab Navigation (Dropdown) -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: var(--text-secondary); font-size: 13px; margin-bottom: 6px;">
+            Select Leaderboard
+          </label>
+          <select id="leaderboard-selector" class="form-input" style="width: 100%; font-size: 16px; padding: 12px;">
+            <option value="teams">Team Categories</option>
+            <option value="climbers">Climber Categories</option>
+            <option value="hardest">Hardest Sends</option>
+            <option value="ticks">Most Ticks</option>
+            <option value="bonus">Bonus Games</option>
+          </select>
         </div>
 
         <!-- Tab Content -->
@@ -196,31 +254,14 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends, most
         <div id="tab-ticks" class="tab-content" style="display: none;">
           ${renderMostTicks(mostTicks)}
         </div>
+
+        <div id="tab-bonus" class="tab-content" style="display: none;">
+          ${renderBonusGamesLeaderboard(bonusGames)}
+        </div>
       </main>
     </div>
 
     <style>
-      .leaderboard-tab {
-        padding: 12px 20px;
-        border: none;
-        background: none;
-        color: var(--text-secondary);
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        white-space: nowrap;
-      }
-
-      .leaderboard-tab:hover {
-        color: var(--text-primary);
-      }
-
-      .leaderboard-tab.active {
-        color: var(--color-primary);
-        border-bottom-color: var(--color-primary);
-      }
-
       .tab-content {
         display: none;
       }
@@ -550,6 +591,103 @@ function renderMostTicks(mostTicks) {
 }
 
 /**
+ * Render bonus games leaderboard
+ * Shows top 5 climbers for each game
+ */
+function renderBonusGamesLeaderboard(bonusGames) {
+  if (!bonusGames || bonusGames.length === 0) {
+    return `
+      <div class="card">
+        <p style="color: var(--text-secondary); text-align: center; padding: 24px;">
+          No active bonus games yet
+        </p>
+      </div>
+    `
+  }
+
+  return bonusGames.map(game => `
+    <div class="card" style="margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin: 0;">
+          ${game.name}
+        </h3>
+      </div>
+
+      ${game.topClimbers && game.topClimbers.length > 0 ? `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-secondary);">
+              <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500; width: 40px;">Rank</th>
+              <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Climber</th>
+              <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Team</th>
+              <th style="padding: 8px; text-align: right; color: var(--text-secondary); font-size: 12px; font-weight: 500; width: 80px;">Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${game.topClimbers.map((entry, index) => {
+              const climber = entry.climbers
+              const team = climber?.teams
+
+              return `
+                <tr style="border-bottom: 1px solid var(--border-tertiary);">
+                  <td style="padding: 12px 8px;">
+                    <div style="
+                      width: 28px;
+                      height: 28px;
+                      border-radius: 50%;
+                      background: ${index === 0 ? '#fbbf24' : index === 1 ? '#d1d5db' : index === 2 ? '#f59e0b' : 'var(--bg-tertiary)'};
+                      color: ${index < 3 ? '#000' : 'var(--text-secondary)'};
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-weight: 600;
+                      font-size: 14px;
+                    ">
+                      ${index + 1}
+                    </div>
+                  </td>
+                  <td style="padding: 12px 8px;">
+                    <div style="color: var(--text-primary); font-weight: 500;">
+                      ${climber?.name || 'Unknown'}
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">
+                      ${climber?.category ? capitalizeFirst(climber.category) : ''}
+                    </div>
+                  </td>
+                  <td style="padding: 12px 8px; color: var(--text-secondary); font-size: 14px;">
+                    ${team?.team_name || 'N/A'}
+                  </td>
+                  <td style="padding: 12px 8px; text-align: right;">
+                    <div style="color: var(--color-primary); font-weight: 600; font-size: 16px;">
+                      ${entry.points_awarded}
+                    </div>
+                  </td>
+                </tr>
+              `
+            }).join('')}
+          </tbody>
+        </table>
+      ` : `
+        <p style="color: var(--text-secondary); text-align: center; padding: 24px;">
+          No entries yet for this game
+        </p>
+      `}
+    </div>
+  `).join('')
+}
+
+/**
+ * Capitalize first letter
+ */
+function capitalizeFirst(str) {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
  * Get category color
  */
 function getCategoryColor(category) {
@@ -574,27 +712,23 @@ function setupLeaderboardListeners() {
     await renderLeaderboards()
   })
 
-  // Tab switching
-  document.querySelectorAll('.leaderboard-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabName = tab.getAttribute('data-tab')
+  // Dropdown selector for tab switching (mobile-friendly)
+  const selector = document.getElementById('leaderboard-selector')
+  selector?.addEventListener('change', (e) => {
+    const tabName = e.target.value
 
-      // Update active tab
-      document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'))
-      tab.classList.add('active')
-
-      // Show corresponding content
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.style.display = 'none'
-        content.classList.remove('active')
-      })
-
-      const targetContent = document.getElementById(`tab-${tabName}`)
-      if (targetContent) {
-        targetContent.style.display = 'block'
-        targetContent.classList.add('active')
-      }
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.style.display = 'none'
+      content.classList.remove('active')
     })
+
+    // Show selected tab content
+    const targetContent = document.getElementById(`tab-${tabName}`)
+    if (targetContent) {
+      targetContent.style.display = 'block'
+      targetContent.classList.add('active')
+    }
   })
 }
 
