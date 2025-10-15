@@ -163,78 +163,109 @@ function renderNudgeContent(settings, recentNudges) {
             Recent Nudges
           </h3>
 
-          ${recentNudges.length > 0 ? `
-            <div style="overflow-x: auto;">
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="border-bottom: 1px solid var(--border-secondary);">
-                    <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Time</th>
-                    <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Type</th>
-                    <th style="padding: 8px; text-align: left; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Message</th>
-                    <th style="padding: 8px; text-align: center; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Leaderboard</th>
-                    <th style="padding: 8px; text-align: center; color: var(--text-secondary); font-size: 12px; font-weight: 500;">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${recentNudges.map(nudge => `
-                    <tr style="border-bottom: 1px solid var(--border-tertiary);">
-                      <td style="padding: 12px 8px; color: var(--text-secondary); font-size: 13px;">
-                        ${new Date(nudge.sent_at).toLocaleString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </td>
-                      <td style="padding: 12px 8px;">
-                        <span style="
-                          padding: 2px 8px;
-                          border-radius: 12px;
-                          font-size: 11px;
-                          font-weight: 600;
-                          background: ${nudge.nudge_type === 'auto' ? 'var(--bg-tertiary)' : '#dbeafe'};
-                          color: ${nudge.nudge_type === 'auto' ? 'var(--text-secondary)' : '#1e40af'};
-                        ">
-                          ${nudge.nudge_type.toUpperCase()}
-                        </span>
-                      </td>
-                      <td style="padding: 12px 8px; color: var(--text-primary); font-size: 14px;">
-                        ${nudge.message}
-                      </td>
-                      <td style="padding: 12px 8px; text-align: center;">
-                        ${nudge.show_leaderboard ?
-                          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' :
-                          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-                        }
-                      </td>
-                      <td style="padding: 12px 8px; text-align: center;">
-                        <span style="
-                          padding: 2px 8px;
-                          border-radius: 12px;
-                          font-size: 11px;
-                          font-weight: 600;
-                          background: ${nudge.is_active ? '#d1fae5' : '#fee2e2'};
-                          color: ${nudge.is_active ? '#065f46' : '#991b1b'};
-                        ">
-                          ${nudge.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          ` : `
-            <p style="color: var(--text-secondary); text-align: center; padding: 24px;">
-              No nudges sent yet
-            </p>
-          `}
+          <div id="recent-nudges-list">
+            ${renderNudgesList(recentNudges)}
+          </div>
         </div>
       </main>
     </div>
   `
 
   setupNudgeListeners()
+}
+
+/**
+ * Render nudges list
+ */
+function renderNudgesList(nudges) {
+  if (!nudges || nudges.length === 0) {
+    return `
+      <p style="color: var(--text-secondary); text-align: center; padding: 24px;">
+        No nudges sent yet
+      </p>
+    `
+  }
+
+  return nudges.map(nudge => `
+    <div class="nudge-item" style="
+      border: 1px solid var(--border-secondary);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: var(--bg-secondary);
+    ">
+      <!-- Row 1: Type, Status, Delete Button -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span style="
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: ${nudge.nudge_type === 'auto' ? 'var(--bg-tertiary)' : '#dbeafe'};
+            color: ${nudge.nudge_type === 'auto' ? 'var(--text-secondary)' : '#1e40af'};
+          ">
+            ${nudge.nudge_type.toUpperCase()}
+          </span>
+          <span style="
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: ${nudge.is_active ? '#d1fae5' : '#fee2e2'};
+            color: ${nudge.is_active ? '#065f46' : '#991b1b'};
+          ">
+            ${nudge.is_active ? 'Active' : 'Inactive'}
+          </span>
+          ${nudge.show_leaderboard ? `
+            <span title="Shows leaderboard" style="color: var(--color-primary);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 20V10M12 20V4M6 20v-6"/>
+              </svg>
+            </span>
+          ` : ''}
+        </div>
+        <button
+          class="delete-nudge-btn"
+          data-nudge-id="${nudge.id}"
+          style="
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+          "
+          onmouseover="this.style.background='#fee2e2'; this.style.color='#dc2626'"
+          onmouseout="this.style.background='none'; this.style.color='var(--text-secondary)'"
+          title="Delete nudge"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Row 2: Message -->
+      <div style="color: var(--text-primary); font-size: 14px; margin-bottom: 8px; line-height: 1.4;">
+        ${nudge.message}
+      </div>
+
+      <!-- Row 3: Timestamp -->
+      <div style="color: var(--text-secondary); font-size: 12px;">
+        ${new Date(nudge.sent_at).toLocaleString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </div>
+    </div>
+  `).join('')
 }
 
 /**
@@ -260,6 +291,69 @@ function getNextAutoNudgeTime(settings) {
 
   // If past 3pm today, show tomorrow's 9am
   return 'Tomorrow 9:00 AM'
+}
+
+/**
+ * Refresh only the recent nudges list
+ */
+async function refreshNudgesList() {
+  try {
+    const { data: nudges, error } = await supabase
+      .from('leaderboard_nudges')
+      .select('*')
+      .order('sent_at', { ascending: false })
+      .limit(10)
+
+    if (error) throw error
+
+    const listContainer = document.getElementById('recent-nudges-list')
+    if (listContainer) {
+      listContainer.innerHTML = renderNudgesList(nudges || [])
+      setupDeleteListeners()
+    }
+  } catch (error) {
+    console.error('Error refreshing nudges list:', error)
+    showError('Failed to refresh nudges list')
+  }
+}
+
+/**
+ * Delete a nudge
+ */
+async function deleteNudge(nudgeId) {
+  try {
+    const { error } = await supabase
+      .from('leaderboard_nudges')
+      .delete()
+      .eq('id', nudgeId)
+
+    if (error) throw error
+
+    showSuccess('Nudge deleted successfully')
+    return true
+  } catch (error) {
+    console.error('Error deleting nudge:', error)
+    showError('Failed to delete nudge: ' + error.message)
+    return false
+  }
+}
+
+/**
+ * Setup delete button listeners
+ */
+function setupDeleteListeners() {
+  document.querySelectorAll('.delete-nudge-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const nudgeId = e.currentTarget.getAttribute('data-nudge-id')
+
+      if (confirm('Delete this nudge? Teams who haven\'t dismissed it will no longer see it.')) {
+        const success = await deleteNudge(nudgeId)
+        if (success) {
+          await refreshNudgesList()
+        }
+      }
+    })
+  })
 }
 
 /**
@@ -295,13 +389,19 @@ function setupNudgeListeners() {
 
       showSuccess('Nudge sent successfully!')
 
-      // Reload page to show new nudge
-      setTimeout(() => renderNudgeManagement(), 1000)
+      // Clear form
+      form.reset()
+
+      // Refresh only the nudge list (not full page)
+      setTimeout(() => refreshNudgesList(), 500)
     } catch (error) {
       console.error('Error sending nudge:', error)
       showError('Failed to send nudge: ' + error.message)
     }
   })
+
+  // Setup delete button listeners for initial load
+  setupDeleteListeners()
 }
 
 export default {
