@@ -76,22 +76,22 @@ async function renderGamesList() {
 
       <div style="max-width: 1280px; margin: 0 auto; padding: 40px 24px;">
         <!-- Page Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-          <div>
-            <h2 style="color: var(--text-primary); font-size: 28px; font-weight: 600; margin-bottom: 8px;">
-              Bonus Games (${games.length})
-            </h2>
+        <div class="page-header" style="margin-bottom: 32px;">
+          <div style="flex: 1 1 auto;">
+            <h2 class="page-title" style="font-size: 28px;">Bonus Games (${games.length})</h2>
             <p style="color: var(--text-secondary);">
               Create bonus challenges and award points to climbers
             </p>
           </div>
-          <button id="create-game-btn" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Create Bonus Game
-          </button>
+          <div class="page-actions">
+            <button id="create-game-btn" class="btn btn-secondary btn-inline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Create Bonus Game
+            </button>
+          </div>
         </div>
 
         ${games.length === 0 ? `
@@ -294,15 +294,22 @@ async function renderAwardPoints() {
 
   if (teamsError) throw teamsError
 
-  // Fetch existing bonus entries for this game
+  // Fetch existing bonus entries for this game with full details
   const { data: existingEntries, error: entriesError } = await supabase
     .from('bonus_entries')
-    .select('climber_id')
+    .select('id, climber_id, points_awarded')
     .eq('bonus_game_id', selectedGame)
 
   if (entriesError) throw entriesError
 
-  const awardedClimbers = new Set(existingEntries.map(e => e.climber_id))
+  // Create map of climber_id -> entry details for awarded climbers
+  const awardedClimbersMap = {}
+  existingEntries.forEach(entry => {
+    awardedClimbersMap[entry.climber_id] = {
+      entryId: entry.id,
+      points: entry.points_awarded
+    }
+  })
 
   app.innerHTML = `
     <div class="min-h-screen" style="background-color: var(--bg-primary);">
@@ -348,7 +355,8 @@ async function renderAwardPoints() {
                   ${team.team_name}
                 </h4>
                 ${team.climbers.map(climber => {
-                  const alreadyAwarded = awardedClimbers.has(climber.id)
+                  const awardedEntry = awardedClimbersMap[climber.id]
+                  const alreadyAwarded = !!awardedEntry
                   return `
                     <div class="climber-item" data-climber-name="${climber.name.toLowerCase()}" style="
                       padding: 12px;
@@ -369,13 +377,38 @@ async function renderAwardPoints() {
                         </div>
                       </div>
                       ${alreadyAwarded ? `
-                        <span style="color: var(--color-success); font-weight: 600; font-size: 13px;">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                          </svg>
-                          Awarded
-                        </span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                          <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg-secondary); border-radius: 4px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-success);">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                              <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <span style="color: var(--text-primary); font-weight: 600; font-size: 14px;">
+                              ${awardedEntry.points} pts
+                            </span>
+                          </div>
+                          <button class="btn btn-secondary edit-award-btn"
+                                  data-entry-id="${awardedEntry.entryId}"
+                                  data-climber-id="${climber.id}"
+                                  data-current-points="${awardedEntry.points}"
+                                  style="padding: 6px 12px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit
+                          </button>
+                          <button class="btn delete-award-btn"
+                                  data-entry-id="${awardedEntry.entryId}"
+                                  data-climber-name="${climber.name}"
+                                  style="padding: 6px 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+                              <polyline points="3 6 5 6 21 6"/>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
                       ` : `
                         <div style="display: flex; gap: 8px; align-items: center;">
                           <input
@@ -564,6 +597,69 @@ function setupAwardPointsListeners() {
         } else {
           showError('Failed to award points: ' + error.message)
         }
+      }
+    })
+  })
+
+  // Edit award buttons
+  document.querySelectorAll('.edit-award-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const entryId = e.currentTarget.getAttribute('data-entry-id')
+      const currentPoints = parseInt(e.currentTarget.getAttribute('data-current-points'))
+
+      // Prompt for new points value
+      const newPointsStr = prompt(`Enter new points value (current: ${currentPoints}):`, currentPoints)
+
+      if (newPointsStr === null) {
+        return // User cancelled
+      }
+
+      const newPoints = parseInt(newPointsStr, 10)
+
+      // Validate points
+      if (!newPoints || newPoints < 1 || newPoints > 999) {
+        showError('Please enter valid points (1-999)')
+        return
+      }
+
+      try {
+        const { error } = await supabase
+          .from('bonus_entries')
+          .update({ points_awarded: newPoints })
+          .eq('id', entryId)
+
+        if (error) throw error
+
+        showSuccess(`Points updated to ${newPoints}!`)
+        await renderAwardPoints()
+      } catch (error) {
+        showError('Failed to update points: ' + error.message)
+      }
+    })
+  })
+
+  // Delete award buttons
+  document.querySelectorAll('.delete-award-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const entryId = e.currentTarget.getAttribute('data-entry-id')
+      const climberName = e.currentTarget.getAttribute('data-climber-name')
+
+      if (!confirm(`Remove bonus points from ${climberName}?`)) {
+        return
+      }
+
+      try {
+        const { error } = await supabase
+          .from('bonus_entries')
+          .delete()
+          .eq('id', entryId)
+
+        if (error) throw error
+
+        showSuccess(`Bonus points removed from ${climberName}`)
+        await renderAwardPoints()
+      } catch (error) {
+        showError('Failed to delete award: ' + error.message)
       }
     })
   })
