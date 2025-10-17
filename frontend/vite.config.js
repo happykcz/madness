@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   // Base public path - set to repo name for GitHub Pages deployment
   // For custom domain or root deployment, change to '/'
   base: '/12qm25/',
+
+  // Remove debug statements in production builds only
+  // This safely strips console.* and debugger without touching source
+  esbuild: command === 'build' ? { drop: ['console', 'debugger'] } : undefined,
 
   // Build options
   build: {
@@ -27,4 +31,4 @@ export default defineConfig({
     port: 4173,
     strictPort: false,
   },
-})
+}))

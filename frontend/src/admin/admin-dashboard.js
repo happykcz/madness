@@ -103,7 +103,7 @@ function renderDashboard(stats) {
 
         <!-- Current Leader (if there are ascents) -->
         ${stats.total_ascents > 0 ? `
-          <div class="card" style="margin-bottom: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <div class="card gradient-primary" style="margin-bottom: 32px;">
             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
@@ -123,7 +123,7 @@ function renderDashboard(stats) {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
           <!-- Team Management -->
           <div class="card hover-card" id="nav-teams" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 10v-2a4 4 0 0 0-3-3.87" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -143,7 +143,7 @@ function renderDashboard(stats) {
 
           <!-- Results & Leaderboard -->
           <div class="card hover-card" id="nav-results" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
                 <path d="M18 20V10M12 20V4M6 20v-6" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -163,7 +163,7 @@ function renderDashboard(stats) {
 
           <!-- Bonus Games -->
           <div class="card hover-card" id="nav-bonus" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -183,7 +183,7 @@ function renderDashboard(stats) {
 
           <!-- Leaderboard Nudge -->
           <div class="card hover-card" id="nav-nudge" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
                 <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -203,7 +203,7 @@ function renderDashboard(stats) {
 
           <!-- Competition Settings -->
           <div class="card hover-card" id="nav-settings" style="cursor: pointer; transition: all 0.2s;">
-            <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink: 0;">
                 <circle cx="12" cy="12" r="3" stroke="var(--color-primary)" stroke-width="2"/>
                 <path d="M12 1v6m0 6v6M1 12h6m6 0h6m-2.5 8.66l-5.2-3m5.2-11.32l-5.2 3m0 8.32l5.2 3m-5.2-11.32l5.2-3" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>

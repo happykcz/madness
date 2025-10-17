@@ -66,17 +66,17 @@ function renderNudgeContent(settings, recentNudges) {
 
       <main class="container" style="padding-top: 24px; padding-bottom: 32px;">
         <!-- Page Header -->
-        <div style="margin-bottom: 24px;">
-          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-bottom: 8px;">
-            Leaderboard Nudges & Announcements
-          </h2>
-          <p style="color: var(--text-secondary); font-size: 14px;">
-            Send manual nudges or announcements to all teams
-          </p>
+        <div class="page-header" style="margin-bottom: 24px;">
+          <div style="flex: 1 1 auto;">
+            <h2 class="page-title">Leaderboard Nudges & Announcements</h2>
+            <p style="color: var(--text-secondary); font-size: 14px;">
+              Send manual nudges or announcements to all teams
+            </p>
+          </div>
         </div>
 
         <!-- Auto-Nudge Status Card -->
-        <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="card gradient-primary" style="margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
             <div>
               <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; opacity: 0.9;">
@@ -147,7 +147,7 @@ function renderNudgeContent(settings, recentNudges) {
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
+            <button type="submit" class="btn btn-primary btn-inline btn-center" style="width: 100%;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
                 <path d="M22 2L11 13"/>
                 <path d="M22 2l-7 20-4-9-9-4 20-7z"/>

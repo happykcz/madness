@@ -108,10 +108,7 @@ function renderHome() {
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness 2025</h1>
             </div>
             <div style="display: flex; gap: 12px;">
-              <button class="btn btn-secondary" onclick="window.location.hash='#/login'">
-                Team Sign In
-              </button>
-              <button class="btn btn-secondary" onclick="window.location.hash='#/admin'">
+              <button class="btn btn-header btn-sm btn-inline" onclick="window.location.hash='#/admin'">
                 Admin
               </button>
             </div>
@@ -122,33 +119,22 @@ function renderHome() {
       <!-- Main content -->
       <main class="container" style="padding-top: 32px;">
         <div class="card max-w-2xl mx-auto text-center">
-          <h2 class="text-2xl font-semibold mb-4" style="color: var(--text-primary);">
-            Climbing Competition Scorekeeper
+          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 700; margin: 0 0 6px;">
+            Quarry Madness 2025
           </h2>
-          <p class="mb-4" style="color: var(--text-secondary);">
-            Powered by Climbers Association of Western Australia
+          <p style="color: var(--text-secondary); margin: 0 0 10px;">
+            A social, 12‑hour climbing jam by CAWA
           </p>
 
-          <div class="mt-6 p-4" style="background-color: var(--bg-secondary); border-radius: 6px;">
-            <p class="text-sm font-semibold mb-2" style="color: var(--text-primary);">
-               Phase 2 Complete
-            </p>
-            <p class="text-sm mb-4" style="color: var(--text-secondary);">
-              Router, Auth, Scoring Engine, and UI Helpers ready
-            </p>
+          <p style="color: var(--text-secondary); margin: 0 0 8px;">
+            This app helps teams log ascents and track points throughout the day — simple, fast, and mobile‑friendly.
+          </p>
+          <p style="color: var(--text-muted); margin: 0 0 16px;">
+            Saturday 18 October 2025 • 6 am – 6 pm
+          </p>
 
-            <ul class="text-sm text-left" style="color: var(--text-secondary); list-style: none; padding: 0;">
-              <li> Supabase client initialized</li>
-              <li> Hash-based routing for GitHub Pages</li>
-              <li> Authentication manager with session handling</li>
-              <li> Scoring engine with all competition rules</li>
-              <li> Category classifier for teams and climbers</li>
-              <li> Toast notifications and loading states</li>
-            </ul>
-          </div>
-
-          <button class="btn btn-primary mt-6" onclick="window.location.hash='#/login'">
-            Get Started
+          <button class="btn btn-primary btn-cta gradient-primary" onclick="window.location.hash='#/login'">
+            Log In to Your Team
           </button>
         </div>
       </main>

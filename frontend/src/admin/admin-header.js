@@ -54,8 +54,8 @@ export function renderAdminHeader(options = {}) {
           <div class="admin-nav-dropdown" style="position: relative;">
             <button
               id="admin-nav-toggle"
-              class="btn btn-secondary"
-              style="font-size: 13px; padding: 6px 12px; display: flex; align-items: center; gap: 6px;"
+              class="btn btn-header btn-sm btn-inline"
+              style=""
             >
               ${dropdownIcon}
               <span style="display: none;" class="nav-label">Menu</span>

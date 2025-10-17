@@ -27,7 +27,7 @@ export async function renderDashboard() {
               <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
-            <button class="btn btn-secondary" id="sign-out-btn">
+            <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
               Sign Out
             </button>
           </div>
@@ -156,7 +156,7 @@ async function renderDashboardContent(data) {
               <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
-            <button class="btn btn-secondary" id="sign-out-btn">
+            <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
               Sign Out
             </button>
           </div>
@@ -261,9 +261,9 @@ async function renderDashboardContent(data) {
           `
         }).join('')}
 
-        <!-- Action Buttons -->
-        <div style="margin-top: 32px;">
-          <button id="goto-scoring" class="btn btn-primary" style="width: 100%;">
+        <!-- Action Button -->
+        <div style="margin-top: 32px; text-align: center;">
+          <button id="goto-scoring" class="btn btn-primary btn-cta btn-inline gradient-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
               <line x1="12" y1="20" x2="12" y2="10"/>
               <line x1="18" y1="20" x2="18" y2="4"/>
@@ -271,6 +271,117 @@ async function renderDashboardContent(data) {
             </svg>
             Start Scoring
           </button>
+        </div>
+
+        <!-- Rules & Scoring (collapsible) -->
+        <div class="accordion" style="margin-top: 16px;">
+          <details>
+            <summary>
+              Scoring Overview
+              <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="content">
+              <ul style="margin: 0; padding-left: 18px;">
+                <li style="margin: 4px 0;">Each route has base points. Trad routes get <strong>+50%</strong>.</li>
+                <li style="margin: 4px 0;">Repeats: <strong>100%</strong>, <strong>75%</strong>, <strong>50%</strong>, <strong>25%</strong>, then <strong>0%</strong>.</li>
+                <li style="margin: 4px 0;">Team score = sum of both climbers’ points.</li>
+                <li style="margin: 4px 0;">Points are whole numbers; partials round down where applicable.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Base Points Guide
+              <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="content">
+              <div style="margin-bottom: 8px;">
+                Rope grades (Ewbank) use banded multipliers when deriving base points:
+              </div>
+              <ul style="margin: 0 0 8px; padding-left: 18px;">
+                <li>≤14 → 0.75× grade</li>
+                <li>15–17 → 1.00× grade</li>
+                <li>18–20 → 1.25× grade</li>
+                <li>21–23 → 1.50× grade</li>
+                <li>≥24 → 1.75× grade</li>
+              </ul>
+              <div style="margin-bottom: 6px;">Boulders map to rope grades with ~30% reduction (e.g. V0≈16 → ~11.2 pts, V6≈26 → ~31.9 pts).</div>
+              <div style="font-size: 12px; color: var(--text-muted);">In-app routes already include set base points from these guidelines.</div>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Categories
+              <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="content">
+              <ul style="margin: 0; padding-left: 18px;">
+                <li><strong>Recreational</strong>: hardest redpoint ≤19</li>
+                <li><strong>Intermediate</strong>: usually 20–23</li>
+                <li><strong>Advanced</strong>: 24+</li>
+                <li><strong>Team category</strong> = stronger/older climber’s category; <strong>Masters</strong> if ≥50 (or both ≥45).</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Safety Rules
+              <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="content">
+              <ul style="margin: 0; padding-left: 18px;">
+                <li>Only experienced, self-sufficient outdoor lead climbers are eligible to enter, and by purchasing a ticket, anyone agrees to the Competition Rules &amp; CAWA terms and conditions.</li>
+                <li>Helmets must be worn while climbing, belaying, and near the cliff.</li>
+                <li>Anyone who is observed endangering themselves or others by climbing like an idiot will be disqualified. This includes:
+                  <ul style="margin-top: 6px; padding-left: 18px;">
+                    <li>Bolt skipping</li>
+                    <li>General reckless behaviour</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              General Rules
+              <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="content">
+              <ul style="margin: 0; padding-left: 18px;">
+                <li>Climbers compete in teams of 2.</li>
+                <li>Climbers are encouraged to wear a fancy dress; however, costumes must be approved as being safe by the head judge, and common sense is advised.</li>
+                <li>Team members belay each other; no external belayers are allowed.</li>
+                <li>Only routes on the score sheet can be climbed.</li>
+                <li>A climb can only be counted if it is lead; a successful "lead" is starting at the bottom, with no top-rope above, clipping gear along the way, and arriving at the anchors with no FALLS, no HANGS, and no PULLING ON GEAR. Trad and mixed climbs must be repointed; pink pointing is permitted on sport routes only.</li>
+                <li>A successful 'second' can also count as an ascent in the competition, however, only on top-out Trad routes. The only routes where this is permitted are [list the routes]. On all other routes, only a lead can be scored.</li>
+                <li>Only one climbing party can be on a route at a time. This applies to all single and multi-pitch routes.</li>
+                <li>Stick Clip: Only stick-clipping the first bolt is permitted.</li>
+                <li>Climbers can have two back-to-back goes (successful or unsuccessful) on a climb, after which they have to move on to another climb before returning to it again.</li>
+                <li>If a climber falls on a climb, they can lower down and have a second attempt. If safe to do so, the climber can choose to leave the rope clipped to their high point and yoyo the climb up to their high point and continue the route. If the climber falls on the second attempt, they must try a different climb before attempting the climb again.</li>
+                <li>Teams must submit their electronic or hard copy score sheet (both provided) before the event ends at 6 pm.</li>
+                <li>Cleaning of routes
+                  <ul style="margin-top: 6px; padding-left: 18px;">
+                    <li>Climbers must clean climbs after they are finished on the route.</li>
+                    <li>At the base of most climbs will be a set of locking carabiners. The first climber to climb each route will place these locking carabiners on the anchor of the climb. For the remainder of the event, climbers can clip and lower off these carabiners in order to clean the route.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </details>
         </div>
       </main>
     </div>
@@ -325,7 +436,7 @@ function renderError(message) {
           <p style="color: var(--text-secondary); margin-bottom: 24px;">
             ${message}
           </p>
-          <button class="btn btn-primary" onclick="window.location.reload()">
+          <button class="btn btn-primary btn-inline btn-center" onclick="window.location.reload()">
             Reload Page
           </button>
         </div>

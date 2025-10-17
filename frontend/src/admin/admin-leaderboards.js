@@ -112,14 +112,13 @@ async function fetchHardestSends() {
     .select('*')
     .order('hardest_send', { ascending: false })
     .order('route_ascents', { ascending: false })
-    .limit(20)
 
   if (error) throw error
   return data
 }
 
 /**
- * Fetch most ticks (climbers by total ascents)
+ * Fetch most ticks (climbers by total ascents - route ascents only, no bonus points)
  * Tiebreaker: lower category wins (recreational < intermediate < advanced)
  */
 async function fetchMostTicks() {
@@ -127,7 +126,6 @@ async function fetchMostTicks() {
     .from('climber_scores')
     .select('*')
     .order('route_ascents', { ascending: false })
-    .limit(20)
 
   if (error) throw error
 
@@ -145,7 +143,7 @@ async function fetchMostTicks() {
 
 /**
  * Fetch bonus games leaderboard
- * Shows top 5 climbers for each active bonus game
+ * Shows all climbers for each active bonus game
  */
 async function fetchBonusGamesLeaderboard() {
   // Fetch all active bonus games
@@ -180,7 +178,6 @@ async function fetchBonusGamesLeaderboard() {
         `)
         .eq('bonus_game_id', game.id)
         .order('points_awarded', { ascending: false })
-        .limit(5)
 
       if (entriesError) {
         console.error('Error fetching entries for game:', game.name, entriesError)
@@ -212,16 +209,16 @@ function renderLeaderboardsContent(teamScores, climberScores, hardestSends, most
 
       <main class="container" style="padding-top: 24px; padding-bottom: 32px;">
         <!-- Page Header with Refresh -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <h2 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin: 0;">
-            Competition Leaderboards
-          </h2>
-          <button id="refresh-btn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-            </svg>
-            Refresh
-          </button>
+        <div class="page-header">
+          <h2 class="page-title">Competition Leaderboards</h2>
+          <div class="page-actions">
+            <button id="refresh-btn" class="btn btn-secondary btn-inline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
         </div>
 
         <!-- Mobile-Friendly Tab Navigation (Dropdown) -->
@@ -286,7 +283,11 @@ function renderTeamLeaderboards(teamScores) {
     { key: 'recreational', label: 'Recreational Teams', color: '#28a745' }
   ]
 
-  return categories.map(cat => `
+  return `
+    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; padding: 12px; background-color: var(--bg-secondary); border-radius: 6px;">
+      <strong>Points include:</strong> Route points + Bonus games
+    </p>
+  ` + categories.map(cat => `
     <div class="card" style="margin-bottom: 24px;">
       <h3 style="
         color: ${cat.color};
@@ -360,7 +361,11 @@ function renderClimberLeaderboards(climberScores) {
     { key: 'recreational', label: 'Recreational Climbers', color: '#28a745' }
   ]
 
-  return categories.map(cat => `
+  return `
+    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; padding: 12px; background-color: var(--bg-secondary); border-radius: 6px;">
+      <strong>Points include:</strong> Route points + Bonus games
+    </p>
+  ` + categories.map(cat => `
     <div class="card" style="margin-bottom: 24px;">
       <h3 style="
         color: ${cat.color};
@@ -437,12 +442,15 @@ function renderHardestSends(hardestSends) {
         color: var(--color-primary);
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
         padding-bottom: 12px;
         border-bottom: 2px solid var(--color-primary);
       ">
-        Top 20 Hardest Sends
+        Hardest Sends
       </h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
+        Total points include route points + bonus games
+      </p>
       ${hardestSends.length > 0 ? `
         <table style="width: 100%; border-collapse: collapse;">
           <thead>
@@ -517,14 +525,17 @@ function renderMostTicks(mostTicks) {
         color: var(--color-primary);
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
         padding-bottom: 12px;
         border-bottom: 2px solid var(--color-primary);
       ">
-        Top 20 Most Ticks (Total Sends)
+        Most Ticks (Route Ascents Only)
       </h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+        <strong>Ticks count:</strong> Route ascents only (bonus games not included)
+      </p>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
-        In case of tie, lower category wins (Recreational > Intermediate > Advanced)
+        <strong>Total points:</strong> Route points + bonus games • <strong>Tiebreaker:</strong> Lower category wins (Recreational > Intermediate > Advanced)
       </p>
       ${mostTicks.length > 0 ? `
         <table style="width: 100%; border-collapse: collapse;">

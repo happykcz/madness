@@ -88,72 +88,44 @@ export async function renderScoring(team, climbers, climberScores) {
   app.innerHTML = `
     <div class="min-h-screen">
       <!-- Header -->
-      <header class="header" style="padding: 12px 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-            <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 32px;" />
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
-                  ${team.team_name}
-                </h1>
-                ${competitionActive ? `
-                  <span style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    font-size: 10px;
-                    padding: 2px 6px;
-                    background-color: #28a745;
-                    color: white;
-                    border-radius: 999px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                  ">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="12" r="10"/>
-                    </svg>
-                    Open
-                  </span>
-                ` : `
-                  <span style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    font-size: 10px;
-                    padding: 2px 6px;
-                    background-color: #dc3545;
-                    color: white;
-                    border-radius: 999px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                  ">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="12" r="10"/>
-                    </svg>
-                    Closed
-                  </span>
-                `}
-              </div>
-              <div style="color: rgba(255,255,255,0.8); font-size: 12px;">
-                Team Total: <span style="color: var(--color-primary); font-weight: 600;">${teamTotalPoints} pts</span> • ${teamTotalAscents} sends
-              </div>
+      <header class="header">
+        <div class="container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <h1 class="ml-4 text-white text-xl font-semibold"> ${team.team_name}</h1>
             </div>
+            <button id="back-to-dashboard" class="btn btn-header btn-sm btn-inline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+              Dashboard
+            </button>
           </div>
-          <button id="back-to-dashboard" class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px; white-space: nowrap;">
-            ← Dashboard
-          </button>
         </div>
       </header>
 
       <!-- Main Content -->
       <main class="container" style="padding-top: 16px; padding-bottom: 32px;">
+        <!-- Subheader: team totals + status -->
+        <div class="subheader">
+          <div class="subheader-left" style="font-size: 13px; color: var(--text-secondary);">
+            Team Total: <span class="metric">${teamTotalPoints} pts</span> • ${teamTotalAscents} sends
+          </div>
+          <span class="status-pill ${competitionActive ? 'open' : 'closed'}">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+            </svg>
+            ${competitionActive ? 'Open' : 'Closed'}
+          </span>
+        </div>
+
         <!-- Nudge Banner -->
         ${nudgeBannerHTML}
 
-        <!-- Climber Selection -->
-        <div class="card" style="margin-bottom: 16px; padding: 12px;">
-          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+        <!-- Climber Selection (Sticky) -->
+        <div id="climber-selection-sticky" class="card" style="position: sticky; top: 0; z-index: 100; margin-bottom: 16px; padding: 12px; background-color: var(--bg-white); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div id="climber-selection-header" style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
             Select Climber
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -167,6 +139,7 @@ export async function renderScoring(team, climbers, climberScores) {
                   class="climber-select-btn"
                   data-climber-id="${climber.id}"
                   data-climber-index="${index}"
+                  data-climber-name="${climber.name}"
                   style="
                     padding: 12px;
                     background-color: var(--bg-secondary);
@@ -177,7 +150,7 @@ export async function renderScoring(team, climbers, climberScores) {
                     transition: all 0.2s;
                   "
                 >
-                  <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
+                  <div class="climber-name-full" style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
                     ${climber.name}
                   </div>
                   <div class="climber-score-display" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
@@ -190,33 +163,23 @@ export async function renderScoring(team, climbers, climberScores) {
         </div>
 
         <!-- Filters -->
-        <div class="card" style="margin-bottom: 16px; padding: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div class="card" style="margin-bottom: 16px; padding: 0;">
+          <div class="card-header">
             <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">
               Filters
             </div>
-            <button id="toggle-all-sectors" class="btn" style="
-              font-size: 12px;
-              padding: 4px 8px;
-              background-color: var(--bg-secondary);
-              color: var(--text-primary);
-              border: 1px solid var(--border-primary);
-            ">
+            <button id="toggle-all-sectors" class="btn btn-secondary btn-sm btn-inline">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
-              Expand All
+              Expand All Sections
             </button>
           </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div class="filters-grid" style="padding: 12px;">
+            <!-- Search -->
+            <input id="filter-search" class="form-input" placeholder="Search route or sector" style="width: 100%;" />
             <!-- Type Filter -->
-            <select id="filter-type" style="
-              padding: 6px 10px;
-              border: 1px solid var(--border-primary);
-              border-radius: 6px;
-              font-size: 13px;
-              background-color: var(--bg-white);
-            ">
+            <select id="filter-type" class="form-input" style="width: 100%;">
               <option value="all">All Types</option>
               <option value="sport">Sport</option>
               <option value="trad">Trad</option>
@@ -224,13 +187,7 @@ export async function renderScoring(team, climbers, climberScores) {
             </select>
 
             <!-- Grade Band Filter -->
-            <select id="filter-gradeband" style="
-              padding: 6px 10px;
-              border: 1px solid var(--border-primary);
-              border-radius: 6px;
-              font-size: 13px;
-              background-color: var(--bg-white);
-            ">
+            <select id="filter-gradeband" class="form-input" style="width: 100%;">
               <option value="all">All Grades</option>
               <option value="recreational">Recreational (≤19)</option>
               <option value="intermediate">Intermediate (20-23)</option>
@@ -238,19 +195,16 @@ export async function renderScoring(team, climbers, climberScores) {
             </select>
 
             <!-- Hide Zero Points -->
-            <label style="
-              display: flex;
-              align-items: center;
-              gap: 6px;
-              padding: 6px 10px;
-              background-color: var(--bg-secondary);
-              border-radius: 6px;
-              font-size: 13px;
-              cursor: pointer;
-            ">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="filter-hide-zero" />
               Hide 0 pts routes
             </label>
+          </div>
+          <div class="filter-chips" style="padding: 0 12px 12px;">
+            <div class="chips" id="filter-chips"></div>
+            <div>
+              <button id="clear-filters" class="btn btn-secondary btn-sm">Clear</button>
+            </div>
           </div>
         </div>
 
@@ -264,6 +218,7 @@ export async function renderScoring(team, climbers, climberScores) {
 
   setupScoringListeners()
   setupNudgeBannerListeners()
+  setupStickyScrollBehavior()
 }
 
 /**
@@ -309,6 +264,9 @@ async function fetchFreshTeamData() {
 
     // Update climber score displays
     updateClimberScoreDisplays()
+
+    // Update team total at the top
+    updateTeamTotal()
   } catch (error) {
     console.error('Error fetching fresh team data:', error)
   }
@@ -327,6 +285,65 @@ function updateClimberScoreDisplays() {
     const scoreDiv = btn.querySelector('.climber-score-display')
     if (scoreDiv) {
       scoreDiv.textContent = `${points} pts • ${ascents} ascents`
+    }
+  })
+}
+
+/**
+ * Update team total display
+ */
+function updateTeamTotal() {
+  const teamTotalPoints = teamData.climberScores.reduce((sum, score) => sum + (score?.total_points || 0), 0)
+  const teamTotalAscents = teamData.climberScores.reduce((sum, score) => sum + (score?.route_ascents || 0), 0)
+
+  const subheaderLeft = document.querySelector('.subheader-left')
+  if (subheaderLeft) {
+    subheaderLeft.innerHTML = `
+      Team Total: <span class="metric">${teamTotalPoints} pts</span> • ${teamTotalAscents} sends
+    `
+  }
+}
+
+/**
+ * Setup sticky scroll behavior for climber selection
+ */
+function setupStickyScrollBehavior() {
+  let isCompact = false
+  const stickyDiv = document.getElementById('climber-selection-sticky')
+  const header = document.getElementById('climber-selection-header')
+
+  if (!stickyDiv || !header) return
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY || window.pageYOffset
+
+    // Toggle compact mode when scrolled down more than 100px
+    if (scrollY > 100 && !isCompact) {
+      isCompact = true
+      // Hide header text
+      header.style.display = 'none'
+      // Make buttons more compact - show only names
+      document.querySelectorAll('.climber-select-btn').forEach(btn => {
+        btn.style.padding = '8px'
+        const scoreDisplay = btn.querySelector('.climber-score-display')
+        if (scoreDisplay) {
+          scoreDisplay.style.display = 'none'
+        }
+      })
+      stickyDiv.style.padding = '8px 12px'
+    } else if (scrollY <= 100 && isCompact) {
+      isCompact = false
+      // Show header text
+      header.style.display = 'block'
+      // Restore full button display
+      document.querySelectorAll('.climber-select-btn').forEach(btn => {
+        btn.style.padding = '12px'
+        const scoreDisplay = btn.querySelector('.climber-score-display')
+        if (scoreDisplay) {
+          scoreDisplay.style.display = 'block'
+        }
+      })
+      stickyDiv.style.padding = '12px'
     }
   })
 }
@@ -389,20 +406,7 @@ function renderRoutesList() {
 
     html += `
       <div class="card" style="margin-bottom: 16px; padding: 0; overflow: hidden;">
-        <div
-          class="sector-header"
-          data-sector="${sectorName}"
-          style="
-            background-color: var(--color-primary-alpha);
-            padding: 12px 16px;
-            border-bottom: ${isCollapsed ? 'none' : '1px solid var(--border-secondary)'};
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          "
-        >
+        <div class="sector-header" data-sector="${sectorName}">
           <div style="display: flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               ${toggleIcon}
@@ -577,6 +581,15 @@ function renderRouteCard(route) {
  */
 function filterRoutes(allRoutes) {
   return allRoutes.filter(route => {
+    // Search filter
+    if (currentFilters.search && currentFilters.search.trim() !== '') {
+      const q = currentFilters.search.trim().toLowerCase()
+      const name = (route.name || '').toLowerCase()
+      const sector = (route.sector || '').toLowerCase()
+      if (!name.includes(q) && !sector.includes(q)) {
+        return false
+      }
+    }
     // Type filter
     if (currentFilters.type !== 'all' && route.gear_type !== currentFilters.type) {
       return false
@@ -631,19 +644,42 @@ function setupScoringListeners() {
   })
 
   // Filter listeners
+  document.getElementById('filter-search')?.addEventListener('input', (e) => {
+    currentFilters.search = e.target.value
+    updateRoutesList()
+    updateFilterChips()
+  })
   document.getElementById('filter-type')?.addEventListener('change', (e) => {
     currentFilters.type = e.target.value
     updateRoutesList()
+    updateFilterChips()
   })
 
   document.getElementById('filter-gradeband')?.addEventListener('change', (e) => {
     currentFilters.gradeband = e.target.value
     updateRoutesList()
+    updateFilterChips()
   })
 
   document.getElementById('filter-hide-zero')?.addEventListener('change', (e) => {
     currentFilters.hideZeroPoint = e.target.checked
     updateRoutesList()
+    updateFilterChips()
+  })
+
+  // Clear all filters
+  document.getElementById('clear-filters')?.addEventListener('click', () => {
+    currentFilters = { search: '', type: 'all', gradeband: 'all', hideZeroPoint: false }
+    const searchEl = document.getElementById('filter-search')
+    const typeEl = document.getElementById('filter-type')
+    const bandEl = document.getElementById('filter-gradeband')
+    const zeroEl = document.getElementById('filter-hide-zero')
+    if (searchEl) searchEl.value = ''
+    if (typeEl) typeEl.value = 'all'
+    if (bandEl) bandEl.value = 'all'
+    if (zeroEl) zeroEl.checked = false
+    updateRoutesList()
+    updateFilterChips()
   })
 
   // Toggle all sectors button
@@ -763,16 +799,42 @@ function updateToggleAllButton() {
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
         <polyline points="6 9 12 15 18 9"/>
       </svg>
-      Expand All
+      Expand All Sections
     `
   } else {
     btn.innerHTML = `
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
         <polyline points="18 15 12 9 6 15"/>
       </svg>
-      Collapse All
+      Collapse All Sections
     `
   }
+}
+
+/**
+ * Render active filter chips
+ */
+function renderFilterChips() {
+  const chips = []
+  if (currentFilters.search && currentFilters.search.trim() !== '') {
+    chips.push(`<span class="chip">Search: ${currentFilters.search}</span>`)
+  }
+  if (currentFilters.type !== 'all') {
+    chips.push(`<span class="chip">Type: ${currentFilters.type}</span>`)
+  }
+  if (currentFilters.gradeband !== 'all') {
+    const label = currentFilters.gradeband.charAt(0).toUpperCase() + currentFilters.gradeband.slice(1)
+    chips.push(`<span class="chip">${label}</span>`)
+  }
+  if (currentFilters.hideZeroPoint) {
+    chips.push('<span class="chip">Hide 0 pts</span>')
+  }
+  return chips.join('')
+}
+
+function updateFilterChips() {
+  const chipsEl = document.getElementById('filter-chips')
+  if (chipsEl) chipsEl.innerHTML = renderFilterChips()
 }
 
 /**
@@ -782,6 +844,7 @@ function updateRoutesList() {
   const container = document.getElementById('routes-container')
   if (container) {
     container.innerHTML = renderRoutesPlaceholder()
+    updateFilterChips()
 
     // Re-attach sector header listeners
     document.querySelectorAll('.sector-header').forEach(header => {
@@ -819,9 +882,11 @@ function updateRoutesList() {
         if (route) {
           showAttemptModal(route)
         }
-      })
     })
+  })
   }
+  // Initialize active chips on first render
+  updateFilterChips()
 }
 
 /**
@@ -885,7 +950,7 @@ async function showAttemptModal(route) {
       </div>
 
       <div style="background-color: var(--bg-secondary); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 16px; color: var(--text-primary); margin-bottom: 4px;">
+        <div style="font-weight: 600; font-size: 16px; color: var(--color-primary); margin-bottom: 4px;">
           ${route.name}
         </div>
         <div style="font-size: 14px; color: var(--text-secondary);">
@@ -894,11 +959,11 @@ async function showAttemptModal(route) {
       </div>
 
       <div style="background-color: #fff5f7; padding: 12px; border-radius: 6px; margin-bottom: ${existingAttempts?.length > 0 ? '16px' : '24px'};">
-        <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">
+        <div style="font-weight: 600; font-size: 14px; color: var(--color-primary); margin-bottom: 4px;">
           ${selectedClimber.data.name}
         </div>
         <div style="font-size: 13px; color: var(--text-secondary);">
-          Tick #${tickNumber} • <span style="color: var(--color-primary); font-weight: 600;">+${tickPoints} points</span>
+          Tick #${tickNumber} • <span style="color: var(--text-primary); font-weight: 600;">+${tickPoints} points</span>
         </div>
       </div>
 
@@ -958,7 +1023,7 @@ async function showAttemptModal(route) {
           <button type="button" id="cancel-btn" class="btn btn-secondary">
             Cancel
           </button>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary btn-inline">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
               <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
             </svg>

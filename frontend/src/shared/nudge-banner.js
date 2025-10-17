@@ -245,7 +245,7 @@ function renderMiniLeaderboard(leaderboard, team) {
             padding: 8px;
             border-radius: 4px;
             margin-bottom: 4px;
-            background: ${isCurrentTeam ? 'rgba(102, 126, 234, 0.15)' : 'transparent'};
+            background: ${isCurrentTeam ? '#fff' : 'transparent'};
             border: ${isCurrentTeam ? '1px solid #667eea' : '1px solid transparent'};
           ">
             <div style="display: flex; align-items: center; gap: 8px;">

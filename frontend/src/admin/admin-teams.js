@@ -75,18 +75,18 @@ async function renderTeamList() {
 
       <div style="max-width: 1280px; margin: 0 auto; padding: 40px 24px;">
         <!-- Page Title and Actions -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-          <div>
-            <h2 style="color: var(--text-primary); font-size: 28px; font-weight: 600; margin-bottom: 8px;">
-              Teams (${teams.length})
-            </h2>
+        <div class="page-header" style="margin-bottom: 32px;">
+          <div style="flex: 1 1 auto;">
+            <h2 class="page-title" style="font-size: 28px;">Teams (${teams.length})</h2>
             <p style="color: var(--text-secondary);">
               Manage team registrations and credentials
             </p>
           </div>
-          <button id="create-team-btn" class="btn btn-primary" style="padding: 10px 20px; opacity: 0.5;" disabled title="Use manual SQL creation for now">
-            + Create New Team (Disabled)
-          </button>
+          <div class="page-actions">
+            <button id="create-team-btn" class="btn btn-secondary btn-inline btn-sm" style="opacity: 0.5;" disabled title="Use manual SQL creation for now">
+              + Create New (Disabled)
+            </button>
+          </div>
         </div>
 
         <!-- Teams Table -->
@@ -139,15 +139,19 @@ function renderTeamsTable(teams) {
               </code>
             </div>
             <span style="
-              display: inline-block;
-              padding: 4px 10px;
-              background-color: ${getCategoryColor(team.category)};
-              color: white;
-              border-radius: 12px;
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              padding: 2px 8px;
+              background-color: var(--bg-tertiary);
+              color: var(--text-secondary);
+              border: 1px solid var(--border-secondary);
+              border-radius: 999px;
               font-size: 12px;
               text-transform: capitalize;
               white-space: nowrap;
             ">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${getCategoryColor(team.category)};"></span>
               ${team.category}
             </span>
           </div>
@@ -156,20 +160,16 @@ function renderTeamsTable(teams) {
               ${team.climbers?.length || 0} climbers • ${new Date(team.created_at).toLocaleDateString()}
             </div>
             <button
-              class="btn-view-team"
+              class="btn btn-primary btn-sm btn-inline btn-view-team"
               data-team-id="${team.id}"
               style="
-                padding: 6px 12px;
-                background-color: var(--color-primary);
-                color: white;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 13px;
-                white-space: nowrap;
+                font-weight: 600;
               "
             >
               View
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 6px;">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -203,8 +203,11 @@ function renderCreateTeamForm() {
 
       <div style="max-width: 800px; margin: 0 auto; padding: 40px 24px;">
         <!-- Back Button -->
-        <button id="back-to-list" class="btn" style="margin-bottom: 24px;">
-          ← Back to Teams
+        <button id="back-to-list" class="btn" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Back to Teams
         </button>
 
         <!-- Form Card -->
@@ -468,7 +471,7 @@ function setupTeamListListeners() {
 
   document.querySelectorAll('.btn-view-team').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const teamId = e.target.dataset.teamId
+      const teamId = e.currentTarget.dataset.teamId
       selectedTeam = teamId
       currentView = 'view'
       await renderTeamManagement()
@@ -653,7 +656,7 @@ function showTeamCredentials(teamId, password, teamName) {
           </div>
 
           <!-- Copy Button -->
-          <button id="copy-credentials" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">
+          <button id="copy-credentials" class="btn btn-primary btn-inline btn-center" style="width: 100%; margin-bottom: 12px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -727,10 +730,13 @@ async function renderTeamDetail(teamId) {
 
       <div style="max-width: 800px; margin: 0 auto; padding: 40px 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <button id="back-to-list" class="btn">
-            ← Back to Teams
+          <button id="back-to-list" class="btn" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Back to Teams
           </button>
-          <button id="edit-team-btn" class="btn btn-primary">
+          <button id="edit-team-btn" class="btn btn-primary btn-inline">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -772,14 +778,18 @@ async function renderTeamDetail(teamId) {
             <div>
               <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;">Category</div>
               <span style="
-                display: inline-block;
-                padding: 4px 12px;
-                background-color: ${getCategoryColor(team.category)};
-                color: white;
-                border-radius: 12px;
-                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 2px 10px;
+                background-color: var(--bg-tertiary);
+                color: var(--text-secondary);
+                border: 1px solid var(--border-secondary);
+                border-radius: 999px;
+                font-size: 13px;
                 text-transform: capitalize;
               ">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${getCategoryColor(team.category)};"></span>
                 ${team.category}
               </span>
             </div>

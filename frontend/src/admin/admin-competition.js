@@ -23,7 +23,7 @@ export async function renderCompetitionControl() {
             <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0;">
               Current Status
             </h2>
-            <button id="refresh-btn" class="btn btn-secondary" style="font-size: 12px; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+            <button id="refresh-btn" class="btn btn-secondary btn-inline" style="font-size: 12px; padding: 4px 8px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
               </svg>
@@ -46,17 +46,13 @@ export async function renderCompetitionControl() {
           </h2>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <button id="btn-open" class="btn" style="
+            <button id="btn-open" class="btn btn-inline btn-center" style="
               background-color: #28a745;
               color: white;
               border: none;
               padding: 10px;
               font-size: 13px;
               font-weight: 500;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
             ">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
@@ -65,17 +61,13 @@ export async function renderCompetitionControl() {
               Open
             </button>
 
-            <button id="btn-close" class="btn" style="
+            <button id="btn-close" class="btn btn-inline btn-center" style="
               background-color: #dc3545;
               color: white;
               border: none;
               padding: 10px;
               font-size: 13px;
               font-weight: 500;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
             ">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
@@ -137,15 +129,11 @@ export async function renderCompetitionControl() {
 
             </div>
 
-            <button type="submit" class="btn btn-primary" style="
+            <button type="submit" class="btn btn-primary btn-inline btn-center" style="
               width: 100%;
               padding: 10px;
               font-size: 13px;
               font-weight: 500;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
             ">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
