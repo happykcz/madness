@@ -127,7 +127,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
       <div class="card" style="max-width: 450px; width: 100%;">
         <!-- CAWA Logo -->
         <div style="text-align: center; margin-bottom: 32px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
+          <img src="/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
           <h1 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-top: 16px;">
             Quarry Madness
           </h1>
@@ -474,7 +474,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold"> ${i.team_name}</h1>
             </div>
             <button id="back-to-dashboard" class="btn btn-header btn-sm btn-inline">
@@ -845,7 +845,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
@@ -873,7 +873,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
@@ -1101,7 +1101,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-secondary" id="sign-out-btn">
@@ -1135,7 +1135,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
       <div class="card" style="max-width: 450px; width: 100%;">
         <!-- CAWA Logo -->
         <div style="text-align: center; margin-bottom: 32px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
+          <img src="/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
           <h1 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-top: 16px;">
             Admin Portal
           </h1>
@@ -1290,7 +1290,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <!-- Left: Logo + Title -->
         <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
+          <img src="/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
           <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
             ${e}
           </h1>
@@ -2021,7 +2021,7 @@ ${_}`}class $ extends Error{constructor({message:e,code:t,cause:r,name:n}){var s
                 padding: 8px 12px;
                 border-radius: 4px;
                 font-size: 13px;
-              ">${window.location.origin}/12qm25/#/login</code>
+              ">${window.location.origin}/#/login</code>
             </div>
           </div>
 
@@ -2046,7 +2046,7 @@ Team Login Credentials
 ══════════════════════
 Team ID:  ${i}
 Password: ${e}
-Login:    ${window.location.origin}/12qm25/#/login
+Login:    ${window.location.origin}/#/login
 
 Instructions:
 1. Go to the login page
@@ -3573,7 +3573,7 @@ Instructions:
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness 2025</h1>
             </div>
             <div style="display: flex; gap: 12px;">
@@ -3609,4 +3609,4 @@ Instructions:
       </main>
     </div>
   `}z.init();
-//# sourceMappingURL=index-DTRBb4jW.js.map
+//# sourceMappingURL=index-CI5xk4_9.js.map
