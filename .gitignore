@@ -1,0 +1,43 @@
+# Credentials and sensitive data
+team-credentials.md
+*credentials*
+*.env
+.env.*
+!.env.example
+
+# Temporary and working files
+AGENTS.md
+IMPORT-INSTRUCTIONS.md
+LEADERBOARD-UPDATES.md
+SCORING-PAGE-FIXES.md
+DEPLOY-GITHUB-MANUAL.md
+GITHUB-AUTH-SETUP.md
+
+# SQL scripts with data
+import-competitors.sql
+supabase/delete_test_data_examples.sql
+supabase/*_backup.sql
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+dist-ssr
+.vite
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Testing
+coverage
+test-results
+playwright-report
