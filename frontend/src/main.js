@@ -104,7 +104,7 @@ function renderHome() {
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness 2025</h1>
             </div>
             <div style="display: flex; gap: 12px;">

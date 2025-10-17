@@ -651,7 +651,7 @@ function showTeamCredentials(teamId, password, teamName) {
                 padding: 8px 12px;
                 border-radius: 4px;
                 font-size: 13px;
-              ">${window.location.origin}/12qm25/#/login</code>
+              ">${window.location.origin}/#/login</code>
             </div>
           </div>
 
@@ -680,7 +680,7 @@ Team Login Credentials
 ══════════════════════
 Team ID:  ${teamId}
 Password: ${password}
-Login:    ${window.location.origin}/12qm25/#/login
+Login:    ${window.location.origin}/#/login
 
 Instructions:
 1. Go to the login page

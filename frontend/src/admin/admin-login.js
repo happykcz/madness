@@ -22,7 +22,7 @@ export function renderAdminLogin() {
       <div class="card" style="max-width: 450px; width: 100%;">
         <!-- CAWA Logo -->
         <div style="text-align: center; margin-bottom: 32px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
+          <img src="/assets/cawa-logo.png" alt="CAWA Logo" style="height: 80px; margin: 0 auto;" />
           <h1 style="color: var(--text-primary); font-size: 24px; font-weight: 600; margin-top: 16px;">
             Admin Portal
           </h1>

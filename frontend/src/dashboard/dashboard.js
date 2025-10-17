@@ -24,7 +24,7 @@ export async function renderDashboard() {
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
@@ -153,7 +153,7 @@ async function renderDashboardContent(data) {
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-header btn-sm btn-inline" id="sign-out-btn">
@@ -413,7 +413,7 @@ function renderError(message) {
         <div class="container">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img src="/12qm25/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
+              <img src="/assets/cawa-logo.png" alt="CAWA Logo" class="h-10" />
               <h1 class="ml-4 text-white text-xl font-semibold">Quarry Madness</h1>
             </div>
             <button class="btn btn-secondary" id="sign-out-btn">

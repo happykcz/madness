@@ -43,7 +43,7 @@ export function renderAdminHeader(options = {}) {
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <!-- Left: Logo + Title -->
         <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="/12qm25/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
+          <img src="/assets/cawa-logo.png" alt="CAWA" style="height: 32px;" />
           <h1 style="color: white; font-size: 16px; font-weight: 600; margin: 0;">
             ${title}
           </h1>
