@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
-  // Base public path - set to repo name for GitHub Pages deployment
-  // For custom domain or root deployment, change to '/'
-  base: '/12qm25/',
+  // Base public path - set to '/' for custom domain
+  // Custom domain: subdomain.happyk.au will serve from root
+  base: '/',
 
   // Remove debug statements in production builds only
   // This safely strips console.* and debugger without touching source
