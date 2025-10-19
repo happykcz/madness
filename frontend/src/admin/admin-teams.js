@@ -183,10 +183,10 @@ function renderTeamsTable(teams) {
  */
 function getCategoryColor(category) {
   const colors = {
-    masters: '#6f42c1',
-    recreational: '#28a745',
-    intermediate: 'var(--color-primary)',
-    advanced: '#d73a49'
+    masters: '#ad1457',
+    recreational: '#f06292',
+    intermediate: '#e91e63',
+    advanced: '#c2185b'
   }
   return colors[category] || '#6c757d'
 }

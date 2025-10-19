@@ -6,7 +6,7 @@
 
 import { router } from '../lib/router.js'
 import { supabase } from '../lib/supabase.js'
-import { showSuccess, showError } from '../shared/ui-helpers.js'
+import { showSuccess, showError, showWarning } from '../shared/ui-helpers.js'
 import { renderAdminHeader, setupAdminHeader } from './admin-header.js'
 
 let currentView = 'list' // 'list', 'create', 'award'
@@ -114,29 +114,99 @@ async function renderGamesList() {
         ` : `
           <!-- Games Grid -->
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-            ${games.map(game => `
+            ${games.map(game => {
+              const safeName = escapeHtml(game.name)
+              const safeDescription = escapeHtml(game.description || '')
+              const encodedName = encodeURIComponent(game.name || '')
+              const encodedDescription = encodeURIComponent(game.description || '')
+              const statusLabel = game.is_active ? 'Active' : 'Inactive'
+              const statusColor = game.is_active ? 'var(--color-success)' : 'var(--text-secondary)'
+              return `
               <div class="card" style="position: relative;">
-                <!-- Active/Inactive Badge -->
-                <div style="position: absolute; top: 16px; right: 16px;">
-                  <span style="
-                    padding: 4px 12px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    background: ${game.is_active ? 'var(--color-success)' : 'var(--text-muted)'};
-                    color: white;
-                  ">
-                    ${game.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-
                 <!-- Game Info -->
-                <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px; padding-right: 80px;">
-                  ${game.name}
-                </h3>
+                <div id="game-name-wrapper-${game.id}" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                  <div style="flex: 1; min-width: 0;">
+                    <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin: 0 0 6px;">
+                      ${safeName}
+                    </h3>
+                    ${safeDescription
+                      ? `<p style="color: var(--text-secondary); font-size: 13px; margin: 0;">${safeDescription}</p>`
+                      : ''}
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                    <span style="
+                      display: inline-flex;
+                      align-items: center;
+                      gap: 6px;
+                      padding: 2px 10px;
+                      background-color: var(--bg-tertiary);
+                      color: ${statusColor};
+                      border: 1px solid var(--border-secondary);
+                      border-radius: 999px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      white-space: nowrap;
+                    ">
+                      <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${statusColor}; display: inline-block;"></span>
+                      ${statusLabel}
+                    </span>
+                    <button
+                      class="btn btn-secondary btn-sm rename-game-btn"
+                      data-game-id="${game.id}"
+                      data-game-name="${encodedName}"
+                      data-game-description="${encodedDescription}"
+                      data-game-points="${game.points}"
+                      style="flex-shrink: 0;"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+                <div id="rename-form-${game.id}" style="display: none; margin-bottom: 12px;">
+                  <label for="rename-input-${game.id}" style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px;">
+                    Update game name
+                  </label>
+                  <input
+                    type="text"
+                    id="rename-input-${game.id}"
+                    class="form-input"
+                    value="${safeName}"
+                    style="width: 100%; box-sizing: border-box; margin-bottom: 12px;"
+                  />
+                  <label for="rename-description-${game.id}" style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px;">
+                    Short description
+                  </label>
+                  <textarea
+                    id="rename-description-${game.id}"
+                    class="form-input"
+                    rows="3"
+                    style="width: 100%; box-sizing: border-box; margin-bottom: 12px; resize: vertical;"
+                  >${safeDescription}</textarea>
+                  <label for="rename-points-${game.id}" style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px;">
+                    Suggested points
+                  </label>
+                  <input
+                    type="number"
+                    id="rename-points-${game.id}"
+                    class="form-input"
+                    value="${game.points}"
+                    min="1"
+                    max="1000"
+                    style="width: 100%; box-sizing: border-box; margin-bottom: 12px;"
+                  />
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary btn-sm save-rename-btn" data-game-id="${game.id}">
+                      Save
+                    </button>
+                    <button class="btn btn-secondary btn-sm cancel-rename-btn" data-game-id="${game.id}">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
                 <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                   <div>
-                    <div style="color: var(--text-secondary); font-size: 12px;">Points</div>
+                    <div style="color: var(--text-secondary); font-size: 12px;">Suggested Points</div>
                     <div style="color: var(--color-primary); font-size: 24px; font-weight: 600;">${game.points}</div>
                   </div>
                   <div>
@@ -155,7 +225,7 @@ async function renderGamesList() {
                   </button>
                 </div>
               </div>
-            `).join('')}
+            `}).join('')}
           </div>
         `}
       </div>
@@ -211,24 +281,42 @@ function renderCreateGame() {
               </p>
             </div>
 
-            <!-- Points -->
+            <!-- Description -->
+            <div style="margin-bottom: 20px;">
+              <label for="game-description" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
+                Short Description
+              </label>
+              <textarea
+                id="game-description"
+                name="description"
+                rows="3"
+                placeholder="Add context for admin team (e.g., qualifying criteria, time window)"
+                class="form-input"
+                style="width: 100%; box-sizing: border-box; resize: vertical;"
+              ></textarea>
+              <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">
+                Optional one-liner that explains how this bonus works
+              </p>
+            </div>
+
+            <!-- Suggested Points -->
             <div style="margin-bottom: 20px;">
               <label for="game-points" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary);">
-                Points Awarded *
+                Suggested Points *
               </label>
               <input
                 type="number"
                 id="game-points"
                 name="points"
                 min="1"
-                max="100"
+                max="1000"
                 value="10"
                 required
                 class="form-input"
                 style="width: 100%; box-sizing: border-box;"
               />
               <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">
-                How many bonus points should climbers receive?
+                Default number of points to suggest when awarding (admins can override per climber)
               </p>
             </div>
 
@@ -330,11 +418,16 @@ async function renderAwardPoints() {
         <!-- Game Info Card -->
         <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);">
           <h2 style="color: white; font-size: 24px; font-weight: 600; margin-bottom: 8px;">
-            ${game.name}
+            ${escapeHtml(game.name)}
           </h2>
           <div style="color: rgba(255,255,255,0.9); font-size: 16px;">
-            <strong>${game.points} points</strong> per climber
+            <strong>${game.points} pts suggested</strong> &bull; Override as needed for each climber
           </div>
+          ${game.description ? `
+            <p style="color: rgba(255,255,255,0.85); font-size: 14px; margin-top: 8px;">
+              ${escapeHtml(game.description)}
+            </p>
+          ` : ''}
         </div>
 
         <!-- Search/Filter -->
@@ -421,7 +514,7 @@ async function renderAwardPoints() {
                             data-climber-id="${climber.id}"
                             value="${game.points}"
                             min="1"
-                            max="999"
+                            max="1000"
                             style="width: 80px; padding: 6px 8px; font-size: 14px;"
                             placeholder="Points"
                           />
@@ -485,6 +578,72 @@ function setupGamesListListeners() {
       }
     })
   })
+
+  // Rename toggles
+  document.querySelectorAll('.rename-game-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const gameId = e.currentTarget.getAttribute('data-game-id')
+      const currentName = decodeURIComponent(e.currentTarget.getAttribute('data-game-name') || '')
+      const currentDescription = decodeURIComponent(e.currentTarget.getAttribute('data-game-description') || '')
+      const currentPoints = parseInt(e.currentTarget.getAttribute('data-game-points') || '0', 10)
+      openRenameForm(gameId, currentName, currentDescription, currentPoints)
+    })
+  })
+
+  // Cancel rename
+  document.querySelectorAll('.cancel-rename-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault()
+      const gameId = e.currentTarget.getAttribute('data-game-id')
+      closeRenameForm(gameId)
+    })
+  })
+
+  // Save rename
+  document.querySelectorAll('.save-rename-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault()
+      const button = e.currentTarget
+      const gameId = button.getAttribute('data-game-id')
+      const input = document.getElementById(`rename-input-${gameId}`)
+      const descriptionInput = document.getElementById(`rename-description-${gameId}`)
+      const pointsInput = document.getElementById(`rename-points-${gameId}`)
+
+      if (!input) return
+
+      const newName = input.value.trim()
+      if (!newName) {
+        showWarning('Please enter a game name before saving')
+        input.focus()
+        return
+      }
+
+      const newDescription = descriptionInput ? descriptionInput.value : ''
+      const newPoints = pointsInput ? parseInt(pointsInput.value, 10) : NaN
+
+      if (!Number.isInteger(newPoints) || newPoints < 1 || newPoints > 1000) {
+        showWarning('Suggested points must be between 1 and 1000')
+        pointsInput?.focus()
+        button.disabled = false
+        button.textContent = 'Save'
+        return
+      }
+
+      try {
+        button.disabled = true
+        button.textContent = 'Saving...'
+        await renameBonusGame(gameId, newName, newDescription, newPoints)
+      } catch (error) {
+        showError('Failed to rename bonus game: ' + error.message)
+      } finally {
+        // Button state resets on re-render, but in case of error, restore text
+        if (button) {
+          button.disabled = false
+          button.textContent = 'Save'
+        }
+      }
+    })
+  })
 }
 
 /**
@@ -500,9 +659,15 @@ function setupCreateFormListeners() {
     e.preventDefault()
 
     const formData = new FormData(e.target)
-    const name = formData.get('name')
+    const name = (formData.get('name') || '').toString().trim()
+    const description = (formData.get('description') || '').toString().trim()
     const points = parseInt(formData.get('points'))
     const isActive = formData.get('is_active') === 'on'
+
+    if (!name) {
+      showWarning('Please provide a name for the bonus game')
+      return
+    }
 
     try {
       const { data: admin } = await supabase.auth.getUser()
@@ -511,6 +676,7 @@ function setupCreateFormListeners() {
         .from('bonus_games')
         .insert({
           name,
+          description,
           points,
           is_active: isActive,
           created_by: admin.user.id
@@ -577,8 +743,8 @@ function setupAwardPointsListeners() {
       const pointsAwarded = parseInt(pointsInput?.value || '0', 10)
 
       // Validate points
-      if (!pointsAwarded || pointsAwarded < 1 || pointsAwarded > 999) {
-        showError('Please enter valid points (1-999)')
+      if (!pointsAwarded || pointsAwarded < 1 || pointsAwarded > 1000) {
+        showError('Please enter valid points (1-1000)')
         return
       }
 
@@ -621,8 +787,8 @@ function setupAwardPointsListeners() {
       const newPoints = parseInt(newPointsStr, 10)
 
       // Validate points
-      if (!newPoints || newPoints < 1 || newPoints > 999) {
-        showError('Please enter valid points (1-999)')
+      if (!newPoints || newPoints < 1 || newPoints > 1000) {
+        showError('Please enter valid points (1-1000)')
         return
       }
 
@@ -667,4 +833,87 @@ function setupAwardPointsListeners() {
       }
     })
   })
+}
+
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function openRenameForm(gameId, currentName, currentDescription = '', currentPoints = 0) {
+  document.querySelectorAll('[id^="rename-form-"]').forEach(formEl => {
+    formEl.style.display = 'none'
+  })
+  document.querySelectorAll('[id^="game-name-wrapper-"]').forEach(wrapperEl => {
+    wrapperEl.style.display = 'flex'
+  })
+
+  const wrapper = document.getElementById(`game-name-wrapper-${gameId}`)
+  const form = document.getElementById(`rename-form-${gameId}`)
+  const input = document.getElementById(`rename-input-${gameId}`)
+  const descriptionInput = document.getElementById(`rename-description-${gameId}`)
+  const pointsInput = document.getElementById(`rename-points-${gameId}`)
+
+  if (!wrapper || !form || !input) return
+
+  wrapper.style.display = 'none'
+  form.style.display = 'block'
+  input.value = currentName
+  if (descriptionInput) {
+    descriptionInput.value = currentDescription
+  }
+  if (pointsInput) {
+    pointsInput.value = currentPoints || ''
+  }
+
+  requestAnimationFrame(() => {
+    input.focus()
+    input.select()
+  })
+}
+
+function closeRenameForm(gameId) {
+  const wrapper = document.getElementById(`game-name-wrapper-${gameId}`)
+  const form = document.getElementById(`rename-form-${gameId}`)
+
+  if (!wrapper || !form) return
+
+  form.style.display = 'none'
+  wrapper.style.display = 'flex'
+}
+
+async function renameBonusGame(gameId, newName, newDescription = '', newPoints = 0) {
+  const trimmedName = newName.trim()
+  const trimmedDescription = newDescription.trim()
+  const normalizedPoints = Number(newPoints)
+
+  if (!trimmedName) {
+    showWarning('Game name cannot be empty')
+    return
+  }
+
+  if (!Number.isInteger(normalizedPoints) || normalizedPoints < 1 || normalizedPoints > 1000) {
+    showWarning('Suggested points must be between 1 and 1000')
+    return
+  }
+
+  const { error } = await supabase
+    .from('bonus_games')
+    .update({
+      name: trimmedName,
+      description: trimmedDescription,
+      points: normalizedPoints
+    })
+    .eq('id', gameId)
+
+  if (error) {
+    throw error
+  }
+
+  showSuccess('Bonus game renamed')
+  await renderGamesList()
 }

@@ -31,7 +31,7 @@ export function renderAdminHeader(options = {}) {
     { id: 'teams', label: 'Team Management', path: '/admin/teams', icon: usersIcon },
     { id: 'leaderboards', label: 'Leaderboards', path: '/admin/leaderboards', icon: trophyIcon },
     { id: 'bonus', label: 'Bonus Games', path: '/admin/bonus', icon: starIcon },
-    { id: 'nudge', label: 'Leaderboard Nudges', path: '/admin/nudge', icon: sendIcon },
+    { id: 'nudge', label: 'Announcements', path: '/admin/nudge', icon: sendIcon },
     { id: 'competition', label: 'Competition Control', path: '/admin/competition', icon: settingsIcon }
   ]
 

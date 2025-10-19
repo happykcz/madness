@@ -45,6 +45,7 @@ router.registerRoutes({
   '/': renderHome,
   '/login': renderLogin,
   '/dashboard': renderDashboard,
+  '/results': renderLeaderboards,
   '/admin': renderAdminLogin,
   '/admin/dashboard': renderAdminDashboard,
   '/admin/teams': renderTeamManagement,
@@ -56,7 +57,7 @@ router.registerRoutes({
 
 // Add auth guard for protected routes
 router.beforeEach(async (to, from, next) => {
-  const teamProtectedRoutes = ['/dashboard']
+  const teamProtectedRoutes = ['/dashboard', '/results']
   const adminProtectedRoutes = ['/admin/dashboard', '/admin/teams', '/admin/leaderboards', '/admin/competition', '/admin/results', '/admin/settings']
 
   // Check team routes

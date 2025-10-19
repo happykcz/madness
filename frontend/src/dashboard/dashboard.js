@@ -261,8 +261,8 @@ async function renderDashboardContent(data) {
           `
         }).join('')}
 
-        <!-- Action Button -->
-        <div style="margin-top: 32px; text-align: center;">
+        <!-- Action Buttons -->
+        <div id="action-buttons" style="margin-top: 32px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
           <button id="goto-scoring" class="btn btn-primary btn-cta btn-inline gradient-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
               <line x1="12" y1="20" x2="12" y2="10"/>
@@ -270,6 +270,18 @@ async function renderDashboardContent(data) {
               <line x1="6" y1="20" x2="6" y2="16"/>
             </svg>
             Start Scoring
+          </button>
+          <button id="view-bonus-games" class="btn btn-secondary btn-cta btn-inline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Bonus Games
+          </button>
+          <button id="goto-results" class="btn btn-secondary btn-cta btn-inline" disabled title="Results will be available after the competition">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+              <path d="M3 3h18v18H3zM3 9h18M9 21V9"/>
+            </svg>
+            View Results
           </button>
         </div>
 
@@ -384,6 +396,48 @@ async function renderDashboardContent(data) {
           </details>
         </div>
       </main>
+
+      <!-- Bonus Games Modal -->
+      <div id="bonus-games-modal" style="
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        z-index: 1000;
+      ">
+        <div style="
+          background: var(--bg-primary);
+          border-radius: 12px;
+          width: min(560px, 100%);
+          max-height: 85vh;
+          overflow: hidden;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+          display: flex;
+          flex-direction: column;
+        ">
+          <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-secondary); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: var(--text-primary);">
+                Bonus Games
+              </h3>
+              <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-secondary);">
+                Overview of all available bonuses and whether they are live.
+              </p>
+            </div>
+            <button id="bonus-games-modal-close" class="btn btn-secondary btn-sm" style="padding: 6px 10px;">
+              Close
+            </button>
+          </div>
+          <div id="bonus-games-modal-content" style="padding: 20px 24px; overflow-y: auto;">
+            <div style="text-align: center; color: var(--text-secondary); font-size: 14px; padding: 24px 0;">
+              Loading bonus games...
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `
 
@@ -399,6 +453,176 @@ async function renderDashboardContent(data) {
   document.getElementById('goto-scoring')?.addEventListener('click', async () => {
     await renderScoring(data.team, data.climbers, data.climberScores)
   })
+
+  document.getElementById('view-bonus-games')?.addEventListener('click', () => {
+    openBonusGamesModal()
+  })
+
+  // Setup results button
+  document.getElementById('goto-results')?.addEventListener('click', () => {
+    // Navigate to results route (not direct function call)
+    window.location.hash = '#/results'
+  })
+
+  // Check if results are open and show the button
+  checkAndShowResultsButton()
+  setupBonusGamesModalListeners()
+}
+
+/**
+ * Check if results are open and enable/disable the button accordingly
+ */
+async function checkAndShowResultsButton() {
+  try {
+    const { data, error } = await supabase
+      .from('competition_settings')
+      .select('results_open')
+      .single()
+
+    if (error) throw error
+
+    const resultsBtn = document.getElementById('goto-results')
+    if (resultsBtn) {
+      if (data?.results_open) {
+        resultsBtn.disabled = false
+        resultsBtn.title = 'View competition results and leaderboards'
+      } else {
+        resultsBtn.disabled = true
+        resultsBtn.title = 'Results will be available after the competition'
+      }
+    }
+  } catch (error) {
+    console.error('Error checking results status:', error)
+  }
+}
+
+let bonusModalEscHandler = null
+
+async function openBonusGamesModal() {
+  const modal = document.getElementById('bonus-games-modal')
+  const content = document.getElementById('bonus-games-modal-content')
+
+  if (!modal || !content) return
+
+  modal.style.display = 'flex'
+  content.innerHTML = `
+    <div style="text-align: center; color: var(--text-secondary); font-size: 14px; padding: 24px 0;">
+      Loading bonus games...
+    </div>
+  `
+
+  // Attach ESC handler
+  if (bonusModalEscHandler) {
+    document.removeEventListener('keydown', bonusModalEscHandler)
+  }
+  bonusModalEscHandler = (event) => {
+    if (event.key === 'Escape') {
+      closeBonusGamesModal()
+    }
+  }
+  document.addEventListener('keydown', bonusModalEscHandler)
+
+  try {
+    const { data: games, error } = await supabase
+      .from('bonus_games')
+      .select('name, description, is_active, points')
+      .order('is_active', { ascending: false })
+      .order('name', { ascending: true })
+
+    if (error) {
+      throw error
+    }
+
+    content.innerHTML = renderBonusGamesList(games || [])
+  } catch (error) {
+    console.error('Failed to load bonus games:', error)
+    content.innerHTML = `
+      <div style="text-align: center; color: var(--color-error, #dc2626); font-size: 14px; padding: 24px;">
+        Unable to load bonus games right now. Please try again soon.
+      </div>
+    `
+  }
+}
+
+function setupBonusGamesModalListeners() {
+  const modal = document.getElementById('bonus-games-modal')
+  const closeBtn = document.getElementById('bonus-games-modal-close')
+
+  closeBtn?.addEventListener('click', () => {
+    closeBonusGamesModal()
+  })
+
+  modal?.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      closeBonusGamesModal()
+    }
+  })
+}
+
+function closeBonusGamesModal() {
+  const modal = document.getElementById('bonus-games-modal')
+  if (!modal) return
+  modal.style.display = 'none'
+
+  if (bonusModalEscHandler) {
+    document.removeEventListener('keydown', bonusModalEscHandler)
+    bonusModalEscHandler = null
+  }
+}
+
+function renderBonusGamesList(games) {
+  if (!games || games.length === 0) {
+    return `
+      <div style="text-align: center; color: var(--text-secondary); font-size: 14px; padding: 24px;">
+        No bonus games have been announced yet. Check back later!
+      </div>
+    `
+  }
+
+  return games.map((game) => {
+    const name = escapeHtml(game.name || 'Untitled Bonus')
+    const description = escapeHtml((game.description || '').trim()) || 'No additional information provided.'
+    const statusLabel = game.is_active ? 'Active' : 'Closed'
+    const statusColor = game.is_active ? 'var(--color-success)' : 'var(--text-muted)'
+    const suggestedPoints = Number.isFinite(game.points) ? game.points : null
+
+    return `
+      <div style="padding: 16px 0; border-bottom: 1px solid var(--border-secondary);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="flex: 1;">
+            <h4 style="margin: 0 0 6px; font-size: 16px; font-weight: 600; color: var(--text-primary);">
+              ${name}
+            </h4>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              ${description}
+            </p>
+            ${suggestedPoints ? `
+              <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">
+                Suggested award: <span style="color: var(--color-primary); font-weight: 600;">${suggestedPoints} pts</span>
+              </p>
+            ` : ''}
+          </div>
+          <span style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 10px;
+            background-color: var(--bg-tertiary);
+            color: ${statusColor};
+            border: 1px solid var(--border-secondary);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+          ">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${statusColor}; display: inline-block;"></span>
+            ${statusLabel}
+          </span>
+        </div>
+      </div>
+    `
+  }).join('')
 }
 
 /**
@@ -452,6 +676,15 @@ function renderError(message) {
 /**
  * Capitalize first letter
  */
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }

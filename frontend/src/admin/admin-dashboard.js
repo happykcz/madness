@@ -189,7 +189,7 @@ function renderDashboard(stats) {
               </svg>
               <div style="flex: 1;">
                 <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 6px;">
-                  Leaderboard Nudges
+                  Announcements and Nudges
                 </h3>
                 <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
                   Send announcements and reminders to check leaderboards

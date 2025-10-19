@@ -21,7 +21,7 @@ export async function renderCompetitionControl() {
         <div class="card" style="margin-bottom: 16px; padding: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0;">
-              Current Status
+              Current Scoring Status
             </h2>
             <button id="refresh-btn" class="btn btn-secondary btn-inline" style="font-size: 12px; padding: 4px 8px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -39,14 +39,137 @@ export async function renderCompetitionControl() {
           </div>
         </div>
 
-        <!-- Manual Control Card -->
+        <!-- Scoring Controls Card -->
         <div class="card" style="margin-bottom: 16px; padding: 16px;">
-          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
-            Manual Control
+          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+            Scoring Window & Overrides
           </h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 16px;">
+            Adjust the automatic scoring window and use manual overrides when you need to react faster than the schedule allows.
+          </p>
+
+          <div style="padding: 16px; background-color: var(--bg-secondary); border-radius: 6px; margin-bottom: 16px;">
+            <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px;">
+              Manual Override
+            </h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 12px;">
+              Use these buttons to open or close scoring immediately. Overrides stay active until you switch back or the scheduled window changes state.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+              <button id="btn-open" class="btn btn-inline btn-center" style="
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 10px;
+                font-size: 13px;
+                font-weight: 500;
+              ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v12M6 12h12"/>
+                </svg>
+                Open Scoring
+              </button>
+
+              <button id="btn-close" class="btn btn-inline btn-center" style="
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 10px;
+                font-size: 13px;
+                font-weight: 500;
+              ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M15 9l-6 6M9 9l6 6"/>
+                </svg>
+                Close Scoring
+              </button>
+            </div>
+
+            <div style="
+              padding: 8px 10px;
+              background-color: rgba(255, 243, 205, 0.7);
+              border: 1px solid #ffeeba;
+              border-radius: 4px;
+              font-size: 11px;
+              color: #856404;
+              line-height: 1.4;
+            ">
+              <strong>Tip:</strong> Manual overrides supersede the scheduled window until you toggle them back off.
+            </div>
+          </div>
+
+          <div style="padding: 16px; background-color: var(--bg-secondary); border-radius: 6px;">
+            <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px;">
+              Scheduled Scoring Window
+            </h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 12px;">
+              Set the start and end times in AWST. The system will automatically open scoring at the start time and close it at the end time.
+            </p>
+
+            <form id="window-form" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+
+                <!-- Start Time -->
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
+                    Competition Start (AWST)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="comp-start"
+                    required
+                    class="form-input"
+                    style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
+                  />
+                </div>
+
+                <!-- End Time -->
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
+                    Competition End (AWST)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="comp-end"
+                    required
+                    class="form-input"
+                    style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
+                  />
+                </div>
+
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-inline btn-center" style="
+                width: 100%;
+                padding: 10px;
+                font-size: 13px;
+                font-weight: 500;
+              ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Save Window Times
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Results Visibility Card -->
+        <div class="card" style="padding: 16px;">
+          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+            Results Visibility
+          </h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 12px;">
+            Control whether teams can access the full results page. This does not impact live scoring during the event.
+          </p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <button id="btn-open" class="btn btn-inline btn-center" style="
+            <button id="btn-results-open" class="btn btn-inline btn-center" style="
               background-color: #28a745;
               color: white;
               border: none;
@@ -55,14 +178,14 @@ export async function renderCompetitionControl() {
               font-weight: 500;
             ">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v12M6 12h12"/>
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
               </svg>
-              Open
+              Show Results
             </button>
 
-            <button id="btn-close" class="btn btn-inline btn-center" style="
-              background-color: #dc3545;
+            <button id="btn-results-close" class="btn btn-inline btn-center" style="
+              background-color: #6c757d;
               color: white;
               border: none;
               padding: 10px;
@@ -70,79 +193,24 @@ export async function renderCompetitionControl() {
               font-weight: 500;
             ">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M15 9l-6 6M9 9l6 6"/>
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
               </svg>
-              Close
+              Hide Results
             </button>
           </div>
 
-          <div style="
+          <div id="results-status-indicator" style="
             padding: 8px 10px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
+            background-color: var(--bg-secondary);
             border-radius: 4px;
-            font-size: 11px;
-            color: #856404;
+            font-size: 12px;
+            color: var(--text-secondary);
             line-height: 1.4;
+            text-align: center;
           ">
-            <strong>Note:</strong> Manual control overrides automatic window timing
+            Loading...
           </div>
-        </div>
-
-        <!-- Scoring Window Times Card -->
-        <div class="card" style="padding: 16px;">
-          <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
-            Scoring Window Times
-          </h2>
-
-          <form id="window-form">
-            <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px;">
-
-              <!-- Start Time -->
-              <div>
-                <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
-                  Competition Start (AWST)
-                </label>
-                <input
-                  type="datetime-local"
-                  id="comp-start"
-                  required
-                  class="form-input"
-                  style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
-                />
-              </div>
-
-              <!-- End Time -->
-              <div>
-                <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
-                  Competition End (AWST)
-                </label>
-                <input
-                  type="datetime-local"
-                  id="comp-end"
-                  required
-                  class="form-input"
-                  style="width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background-color: var(--bg-secondary);"
-                />
-              </div>
-
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-inline btn-center" style="
-              width: 100%;
-              padding: 10px;
-              font-size: 13px;
-              font-weight: 500;
-            ">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                <polyline points="17 21 17 13 7 13 7 21"/>
-                <polyline points="7 3 7 8 15 8"/>
-              </svg>
-              Save Window Times
-            </button>
-          </form>
         </div>
 
       </main>
@@ -277,6 +345,17 @@ async function loadStatus() {
       </div>
     `
 
+    // Update results status indicator
+    const resultsIndicator = document.getElementById('results-status-indicator')
+    if (resultsIndicator) {
+      const resultsOpen = settings.results_open || false
+      resultsIndicator.innerHTML = `
+        <strong>Results Page:</strong> ${resultsOpen ? '✅ Visible to teams' : '❌ Hidden from teams'}
+      `
+      resultsIndicator.style.backgroundColor = resultsOpen ? 'rgba(40, 167, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)'
+      resultsIndicator.style.color = resultsOpen ? '#28a745' : '#6c757d'
+    }
+
   } catch (error) {
     console.error('Error loading status:', error)
     statusDisplay.innerHTML = `
@@ -404,11 +483,63 @@ async function updateWindowTimes(e) {
   }
 }
 
+async function openResults() {
+  try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('competition_settings')
+      .select('*')
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const { error: updateError } = await supabase
+      .from('competition_settings')
+      .update({ results_open: true, updated_at: new Date().toISOString() })
+      .eq('id', settings.id)
+
+    if (updateError) throw updateError
+
+    showSuccess('Results page is now visible to teams')
+    await loadStatus()
+
+  } catch (error) {
+    console.error('Error opening results:', error)
+    showError('Failed to open results: ' + error.message)
+  }
+}
+
+async function closeResults() {
+  try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('competition_settings')
+      .select('*')
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const { error: updateError } = await supabase
+      .from('competition_settings')
+      .update({ results_open: false, updated_at: new Date().toISOString() })
+      .eq('id', settings.id)
+
+    if (updateError) throw updateError
+
+    showSuccess('Results page is now hidden from teams')
+    await loadStatus()
+
+  } catch (error) {
+    console.error('Error closing results:', error)
+    showError('Failed to close results: ' + error.message)
+  }
+}
+
 function setupListeners() {
   setupAdminHeader()
 
   document.getElementById('refresh-btn')?.addEventListener('click', loadStatus)
   document.getElementById('btn-open')?.addEventListener('click', openCompetition)
   document.getElementById('btn-close')?.addEventListener('click', closeCompetition)
+  document.getElementById('btn-results-open')?.addEventListener('click', openResults)
+  document.getElementById('btn-results-close')?.addEventListener('click', closeResults)
   document.getElementById('window-form')?.addEventListener('submit', updateWindowTimes)
 }
